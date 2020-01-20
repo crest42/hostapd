@@ -32,7 +32,6 @@
 #ifdef _MSC_VER
 #pragma pack(push, 1)
 #endif /* _MSC_VER */
-
 struct ieee8023_hdr {
 	u8 dest[6];
 	u8 src[6];
@@ -173,7 +172,8 @@ static int wired_init_sockets(struct wpa_driver_wired_data *drv, u8 *own_addr)
 	struct sockaddr_in addr2;
 	int n = 1;
 
-	drv->common.sock = socket(PF_PACKET, SOCK_RAW, htons(ETH_P_PAE));
+	drv->common.sock = socket(PF_PACKET, SOCK_RAW, htons(ETH_P_ALL));
+	//drv->common.sock = socket(PF_PACKET, SOCK_RAW, htons(ETH_P_PAE));
 	if (drv->common.sock < 0) {
 		wpa_printf(MSG_ERROR, "socket[PF_PACKET,SOCK_RAW]: %s",
 			   strerror(errno));
