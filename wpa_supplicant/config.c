@@ -2453,6 +2453,7 @@ static const struct parse_data ssid_fields[] = {
 	{ INT(eapol_flags) },
 	{ INTe(sim_num, sim_num) },
 	{ STRe(openssl_ciphers, openssl_ciphers) },
+	{ STRe(openssl_ecdh_curves, openssl_ecdh_curves) },
 	{ INTe(erp, erp) },
 #endif /* IEEE8021X_EAPOL */
 #ifdef CONFIG_WEP
@@ -4937,6 +4938,7 @@ static const struct global_parse_data global_fields[] = {
 	{ STR(pkcs11_engine_path), 0 },
 	{ STR(pkcs11_module_path), 0 },
 	{ STR(openssl_ciphers), 0 },
+	{ STR(openssl_ecdh_curves), 0 },
 	{ STR(pcsc_reader), 0 },
 	{ STR(pcsc_pin), 0 },
 	{ INT(external_sim), 0 },
