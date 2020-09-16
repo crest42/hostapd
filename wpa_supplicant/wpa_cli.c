@@ -3061,7 +3061,7 @@ static int wpa_cli_cmd_dpp_pkex_remove(struct wpa_ctrl *ctrl, int argc,
 
 static int wpa_ctrl_command_bss(struct wpa_ctrl *ctrl, const char *cmd)
 {
-	char buf[512], *pos, *bssid, *freq, *level, *flags, *ssid;
+	char buf[512], *pos = NULL, *bssid = NULL, *freq = NULL, *level = NULL, *flags = NULL, *ssid = NULL;
 	size_t len;
 	int ret, id = -1;
 

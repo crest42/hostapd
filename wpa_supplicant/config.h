@@ -586,6 +586,7 @@ struct wpa_config {
 	 * default.
 	 */
 	char *openssl_ciphers;
+	char *openssl_ecdh_curves;
 
 	/**
 	 * pcsc_reader - PC/SC reader name prefix
