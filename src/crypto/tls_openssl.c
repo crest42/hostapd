@@ -16,6 +16,15 @@
 #endif
 #endif
 
+#include <sys/random.h>
+#define RND_LEN (8)
+static int rnd_len = RND_LEN;
+static unsigned char rnd[RND_LEN];
+static unsigned char hex[(RND_LEN*2)+1];
+static unsigned char groups[256];
+static char benchmark_results[256][256];
+static int random_set = false;
+static int bcount = 0;
 #include <openssl/ssl.h>
 #include <openssl/err.h>
 #include <openssl/opensslv.h>
@@ -727,21 +736,53 @@ static int tls_cryptoapi_cert(SSL *ssl, const char *name)
 }
 
 #endif /* CONFIG_NATIVE_WINDOWS */
+static void rnd_to_hex(unsigned char *rnd, unsigned char *hex) {
+	(void)rnd;
+	(void)hex;
+	 char *pos = (char *)hex;
+	for(int i = 0;i<RND_LEN;i++) {
+		sprintf(pos,"%02x",rnd[i]);
+		pos += 2;
+	}
+	hex[(RND_LEN*2)] = 0;
+	return;
+}
 
+static void print_bench(void) {
+	for(int i = 0;i<256;i++) {
+		if(benchmark_results[i][0] == 0){
+			break;
+		}
+		fprintf(stderr,"%s\n", benchmark_results[i]);
+	}
+}
+
+static void tls_info_cb_bench(const SSL *ssl, int where, int ret, const char *str)
+{
+	if(!random_set) {
+		getrandom(&rnd, rnd_len, 0);
+		rnd_to_hex(rnd, hex);
+		random_set = true;
+	}
+	sprintf(benchmark_results[bcount], "Bench: type=tls_info_cb_bench rnd=%s groups=%s where=0x%x ret=0x%x clocks=%lu str=%s", hex, groups, where, ret, clock(), str);
+	bcount++;
+}
 
 static void ssl_info_cb(const SSL *ssl, int where, int ret)
 {
 	const char *str;
 	int w;
-
 	wpa_printf(MSG_DEBUG, "SSL: (where=0x%x ret=0x%x)", where, ret);
 	w = where & ~SSL_ST_MASK;
-	if (w & SSL_ST_CONNECT)
+	if (w & SSL_ST_CONNECT) {
+
 		str = "SSL_connect";
+	}
 	else if (w & SSL_ST_ACCEPT)
 		str = "SSL_accept";
 	else
 		str = "undefined";
+	tls_info_cb_bench(ssl,where,ret,str);
 
 	if (where & SSL_CB_LOOP) {
 		wpa_printf(MSG_DEBUG, "SSL: %s:%s",
@@ -1487,9 +1528,23 @@ static void check_server_key_exchange(SSL *ssl, struct tls_connection *conn,
 #endif /* CONFIG_SUITEB */
 
 
+
+static void tls_msg_cb_bench(int write_p, int version, int content_type,
+		       const void *buf, size_t len, SSL *ssl, void *arg)
+{
+	if(!random_set) {
+		getrandom(&rnd, rnd_len, 0);
+		rnd_to_hex(rnd, hex);
+		random_set = true;
+	}
+	sprintf(benchmark_results[bcount], "Bench: type=tls_msg_cb_bench rnd=%s groups=%s write_p=0x%x ver=0x%x content_type=%d content_type_string='%s' handshake_type_string='%s' len=%lu", hex, groups, write_p, version, content_type, openssl_content_type(content_type), openssl_handshake_type(content_type, buf, len), len);
+	bcount++;
+}
+
 static void tls_msg_cb(int write_p, int version, int content_type,
 		       const void *buf, size_t len, SSL *ssl, void *arg)
 {
+	tls_msg_cb_bench(write_p, version, content_type,buf,len,ssl,arg);
 	struct tls_connection *conn = arg;
 	const u8 *pos = buf;
 
@@ -4417,6 +4472,7 @@ openssl_connection_handshake(struct tls_connection *conn,
 		wpa_printf(MSG_DEBUG,
 			   "OpenSSL: Handshake finished - resumed=%d",
 			   tls_connection_resumed(conn->ssl_ctx, conn));
+		print_bench();
 		if (conn->server) {
 			char *buf;
 			size_t buflen = 2000;
@@ -5221,6 +5277,7 @@ int tls_connection_set_params(void *tls_ctx, struct tls_connection *conn,
 		return -1;
 #else /* OPENSSL_IS_BORINGSSL || < 1.0.2 */
 #ifndef OPENSSL_NO_EC
+		memcpy(groups, params->openssl_ecdh_curves, strlen(params->openssl_ecdh_curves));
 		if (SSL_set1_curves_list(conn->ssl,
 					 params->openssl_ecdh_curves) != 1) {
 			wpa_printf(MSG_INFO,
