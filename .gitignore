@@ -1,6 +1,7 @@
 *.a
 *.o
 *.d
+!wpa_supplicant/raddb_template/policy.d
 *.gcno
 *.gcda
 *.gcov
