@@ -23,6 +23,7 @@ wpa_supplicant/wpa_gui-qt4/Makefile
 wpa_supplicant/wpa_gui-qt4/wpa_gui
 wpa_supplicant/libwpa_test1
 wpa_supplicant/libwpa_test2
+wpa_supplicant/confs
 hostapd/hostapd
 hostapd/hostapd_cli
 hostapd/hlr_auc_gw
