@@ -44,7 +44,10 @@ for e in range(runs):
 #            time.sleep(1)
             if rc != 0:
                 print(f"Error {filename} aborted with {rc}")
+                print(client)
+                print(server)
                 os.remove(logfile_name)
                 sys.exit(rc)
                 #break
             print(f"{filename} rc: {rc} {i}/{len(h_dirlist)}")
+

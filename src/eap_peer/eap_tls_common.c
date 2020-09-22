@@ -482,13 +482,13 @@ static int eap_peer_tls_reassemble_fragment(struct eap_ssl_data *data,
 		return -1;
 	}
 
-	if (tls_in_len + in_len > 65536) {
+	if (tls_in_len + in_len > 65536*100) {
 		/*
 		 * Limit length to avoid rogue servers from causing large
 		 * memory allocations.
 		 */
 		wpa_printf(MSG_INFO, "SSL: Too long TLS fragment (size over "
-			   "64 kB)");
+			   "100*64 kB)");
 		eap_peer_tls_reset_input(data);
 		return -1;
 	}
