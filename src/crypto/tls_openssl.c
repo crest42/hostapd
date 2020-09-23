@@ -22,9 +22,10 @@ static int rnd_len = RND_LEN;
 static unsigned char rnd[RND_LEN];
 static unsigned char hex[(RND_LEN*2)+1];
 static unsigned char groups[256];
-static char benchmark_results[256][256];
+static char benchmark_results[512][1024];
 static int random_set = false;
 static int bcount = 0;
+#include <assert.h>
 #include <openssl/ssl.h>
 #include <openssl/err.h>
 #include <openssl/opensslv.h>
@@ -749,7 +750,7 @@ static void rnd_to_hex(unsigned char *rnd, unsigned char *hex) {
 }
 
 static void print_bench(void) {
-	for(int i = 0;i<256;i++) {
+	for(int i = 0;i<512;i++) {
 		if(benchmark_results[i][0] == 0){
 			break;
 		}
@@ -764,6 +765,7 @@ static void tls_info_cb_bench(const SSL *ssl, int where, int ret, const char *st
 		rnd_to_hex(rnd, hex);
 		random_set = true;
 	}
+	assert(bcount < 512);
 	sprintf(benchmark_results[bcount], "Bench: type=tls_info_cb_bench rnd=%s groups=%s where=0x%x ret=0x%x clocks=%lu str=%s", hex, groups, where, ret, clock(), str);
 	bcount++;
 }

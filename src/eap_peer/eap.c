@@ -32,8 +32,8 @@
 #define STATE_MACHINE_DATA struct eap_sm
 #define STATE_MACHINE_DEBUG_PREFIX "EAP"
 
-#define EAP_MAX_AUTH_ROUNDS 500
-#define EAP_MAX_AUTH_ROUNDS_SHORT 500
+#define EAP_MAX_AUTH_ROUNDS 4000
+#define EAP_MAX_AUTH_ROUNDS_SHORT 4000
 #define EAP_CLIENT_TIMEOUT_DEFAULT 60
 
 
@@ -1249,19 +1249,25 @@ static void eap_peer_sm_step_received(struct eap_sm *sm)
 	else if (sm->rxReq && !duplicate &&
 		 sm->selectedMethod == EAP_TYPE_NONE &&
 		 sm->reqMethod != EAP_TYPE_IDENTITY &&
-		 sm->reqMethod != EAP_TYPE_NOTIFICATION)
+		 sm->reqMethod != EAP_TYPE_NOTIFICATION){
+		wpa_printf(MSG_DEBUG, "GET_METHOD");
 		SM_ENTER(EAP, GET_METHOD);
+	}
 	else if (sm->rxReq && !duplicate &&
 		 sm->reqMethod == sm->selectedMethod &&
-		 sm->methodState != METHOD_DONE)
+		 sm->methodState != METHOD_DONE) {
+		wpa_printf(MSG_DEBUG, "METHOD");
 		SM_ENTER(EAP, METHOD);
+	}
 	else if (sm->selectedMethod == EAP_TYPE_LEAP &&
 		 (sm->rxSuccess || sm->rxResp))
 		SM_ENTER(EAP, METHOD);
 	else if (sm->reauthInit)
 		SM_ENTER(EAP, SEND_RESPONSE);
-	else
+	else {
+		wpa_printf(MSG_DEBUG, "ERROR");
 		SM_ENTER(EAP, DISCARD);
+	}
 }
 
 

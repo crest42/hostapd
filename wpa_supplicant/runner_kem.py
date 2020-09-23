@@ -6,7 +6,7 @@ i = 0
 KEM_CONF_DIR='./confs/kem/'
 dirlist = os.listdir(KEM_CONF_DIR)
 stamp = int(time.time())
-runs=1
+runs=100
 for e in range(runs):
     for i, filename in enumerate(dirlist):
         if filename.endswith(".conf"):
