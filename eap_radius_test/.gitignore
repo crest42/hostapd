@@ -1,3 +1,4 @@
 *.service
 !scripts/raddb_template/policy.d
 confs
+logs
