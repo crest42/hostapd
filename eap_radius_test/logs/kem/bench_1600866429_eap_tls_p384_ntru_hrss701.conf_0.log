@@ -1,0 +1,45 @@
+Bench: type=tls_info_cb_bench rnd=b56f03f306d51a9e groups=p384_ntru_hrss701 where=0x10 ret=0x1 clocks=4332 str=undefined
+Bench: type=tls_info_cb_bench rnd=b56f03f306d51a9e groups=p384_ntru_hrss701 where=0x1001 ret=0x1 clocks=4359 str=SSL_connect
+Bench: type=tls_msg_cb_bench rnd=b56f03f306d51a9e groups=p384_ntru_hrss701 write_p=0x1 ver=0x0 content_type=256 content_type_string='TLS header info' handshake_type_string='' len=5
+Bench: type=tls_msg_cb_bench rnd=b56f03f306d51a9e groups=p384_ntru_hrss701 write_p=0x1 ver=0x304 content_type=22 content_type_string='handshake' handshake_type_string='client hello' len=1433
+Bench: type=tls_info_cb_bench rnd=b56f03f306d51a9e groups=p384_ntru_hrss701 where=0x1001 ret=0x1 clocks=6555 str=SSL_connect
+Bench: type=tls_info_cb_bench rnd=b56f03f306d51a9e groups=p384_ntru_hrss701 where=0x1002 ret=0xffffffff clocks=6560 str=SSL_connect
+Bench: type=tls_msg_cb_bench rnd=b56f03f306d51a9e groups=p384_ntru_hrss701 write_p=0x0 ver=0x0 content_type=256 content_type_string='TLS header info' handshake_type_string='' len=5
+Bench: type=tls_info_cb_bench rnd=b56f03f306d51a9e groups=p384_ntru_hrss701 where=0x1001 ret=0x1 clocks=9373 str=SSL_connect
+Bench: type=tls_msg_cb_bench rnd=b56f03f306d51a9e groups=p384_ntru_hrss701 write_p=0x0 ver=0x304 content_type=22 content_type_string='handshake' handshake_type_string='server hello' len=1297
+Bench: type=tls_msg_cb_bench rnd=b56f03f306d51a9e groups=p384_ntru_hrss701 write_p=0x0 ver=0x0 content_type=256 content_type_string='TLS header info' handshake_type_string='' len=5
+Bench: type=tls_msg_cb_bench rnd=b56f03f306d51a9e groups=p384_ntru_hrss701 write_p=0x0 ver=0x0 content_type=256 content_type_string='TLS header info' handshake_type_string='' len=5
+Bench: type=tls_msg_cb_bench rnd=b56f03f306d51a9e groups=p384_ntru_hrss701 write_p=0x0 ver=0x304 content_type=257 content_type_string='inner content type' handshake_type_string='handshake' len=1
+Bench: type=tls_info_cb_bench rnd=b56f03f306d51a9e groups=p384_ntru_hrss701 where=0x1001 ret=0x1 clocks=11212 str=SSL_connect
+Bench: type=tls_msg_cb_bench rnd=b56f03f306d51a9e groups=p384_ntru_hrss701 write_p=0x0 ver=0x304 content_type=22 content_type_string='handshake' handshake_type_string='encrypted extensions' len=162
+Bench: type=tls_msg_cb_bench rnd=b56f03f306d51a9e groups=p384_ntru_hrss701 write_p=0x0 ver=0x0 content_type=256 content_type_string='TLS header info' handshake_type_string='' len=5
+Bench: type=tls_msg_cb_bench rnd=b56f03f306d51a9e groups=p384_ntru_hrss701 write_p=0x0 ver=0x304 content_type=257 content_type_string='inner content type' handshake_type_string='handshake' len=1
+Bench: type=tls_info_cb_bench rnd=b56f03f306d51a9e groups=p384_ntru_hrss701 where=0x1001 ret=0x1 clocks=11255 str=SSL_connect
+Bench: type=tls_msg_cb_bench rnd=b56f03f306d51a9e groups=p384_ntru_hrss701 write_p=0x0 ver=0x304 content_type=22 content_type_string='handshake' handshake_type_string='certificate request' len=140
+Bench: type=tls_msg_cb_bench rnd=b56f03f306d51a9e groups=p384_ntru_hrss701 write_p=0x0 ver=0x0 content_type=256 content_type_string='TLS header info' handshake_type_string='' len=5
+Bench: type=tls_msg_cb_bench rnd=b56f03f306d51a9e groups=p384_ntru_hrss701 write_p=0x0 ver=0x304 content_type=257 content_type_string='inner content type' handshake_type_string='handshake' len=1
+Bench: type=tls_info_cb_bench rnd=b56f03f306d51a9e groups=p384_ntru_hrss701 where=0x1001 ret=0x1 clocks=11313 str=SSL_connect
+Bench: type=tls_msg_cb_bench rnd=b56f03f306d51a9e groups=p384_ntru_hrss701 write_p=0x0 ver=0x304 content_type=22 content_type_string='handshake' handshake_type_string='certificate' len=3624
+Bench: type=tls_msg_cb_bench rnd=b56f03f306d51a9e groups=p384_ntru_hrss701 write_p=0x0 ver=0x0 content_type=256 content_type_string='TLS header info' handshake_type_string='' len=5
+Bench: type=tls_msg_cb_bench rnd=b56f03f306d51a9e groups=p384_ntru_hrss701 write_p=0x0 ver=0x304 content_type=257 content_type_string='inner content type' handshake_type_string='handshake' len=1
+Bench: type=tls_info_cb_bench rnd=b56f03f306d51a9e groups=p384_ntru_hrss701 where=0x1001 ret=0x1 clocks=13199 str=SSL_connect
+Bench: type=tls_msg_cb_bench rnd=b56f03f306d51a9e groups=p384_ntru_hrss701 write_p=0x0 ver=0x304 content_type=22 content_type_string='handshake' handshake_type_string='certificate verify' len=2128
+Bench: type=tls_msg_cb_bench rnd=b56f03f306d51a9e groups=p384_ntru_hrss701 write_p=0x0 ver=0x0 content_type=256 content_type_string='TLS header info' handshake_type_string='' len=5
+Bench: type=tls_msg_cb_bench rnd=b56f03f306d51a9e groups=p384_ntru_hrss701 write_p=0x0 ver=0x304 content_type=257 content_type_string='inner content type' handshake_type_string='handshake' len=1
+Bench: type=tls_info_cb_bench rnd=b56f03f306d51a9e groups=p384_ntru_hrss701 where=0x1001 ret=0x1 clocks=13715 str=SSL_connect
+Bench: type=tls_msg_cb_bench rnd=b56f03f306d51a9e groups=p384_ntru_hrss701 write_p=0x0 ver=0x304 content_type=22 content_type_string='handshake' handshake_type_string='finished' len=52
+Bench: type=tls_info_cb_bench rnd=b56f03f306d51a9e groups=p384_ntru_hrss701 where=0x1001 ret=0x1 clocks=13775 str=SSL_connect
+Bench: type=tls_msg_cb_bench rnd=b56f03f306d51a9e groups=p384_ntru_hrss701 write_p=0x1 ver=0x0 content_type=256 content_type_string='TLS header info' handshake_type_string='' len=5
+Bench: type=tls_msg_cb_bench rnd=b56f03f306d51a9e groups=p384_ntru_hrss701 write_p=0x1 ver=0x304 content_type=257 content_type_string='inner content type' handshake_type_string='handshake' len=1
+Bench: type=tls_msg_cb_bench rnd=b56f03f306d51a9e groups=p384_ntru_hrss701 write_p=0x1 ver=0x304 content_type=22 content_type_string='handshake' handshake_type_string='certificate' len=3624
+Bench: type=tls_info_cb_bench rnd=b56f03f306d51a9e groups=p384_ntru_hrss701 where=0x1001 ret=0x1 clocks=14261 str=SSL_connect
+Bench: type=tls_msg_cb_bench rnd=b56f03f306d51a9e groups=p384_ntru_hrss701 write_p=0x1 ver=0x0 content_type=256 content_type_string='TLS header info' handshake_type_string='' len=5
+Bench: type=tls_msg_cb_bench rnd=b56f03f306d51a9e groups=p384_ntru_hrss701 write_p=0x1 ver=0x304 content_type=257 content_type_string='inner content type' handshake_type_string='handshake' len=1
+Bench: type=tls_msg_cb_bench rnd=b56f03f306d51a9e groups=p384_ntru_hrss701 write_p=0x1 ver=0x304 content_type=22 content_type_string='handshake' handshake_type_string='certificate verify' len=2128
+Bench: type=tls_info_cb_bench rnd=b56f03f306d51a9e groups=p384_ntru_hrss701 where=0x1001 ret=0x1 clocks=14840 str=SSL_connect
+Bench: type=tls_msg_cb_bench rnd=b56f03f306d51a9e groups=p384_ntru_hrss701 write_p=0x1 ver=0x0 content_type=256 content_type_string='TLS header info' handshake_type_string='' len=5
+Bench: type=tls_msg_cb_bench rnd=b56f03f306d51a9e groups=p384_ntru_hrss701 write_p=0x1 ver=0x304 content_type=257 content_type_string='inner content type' handshake_type_string='handshake' len=1
+Bench: type=tls_msg_cb_bench rnd=b56f03f306d51a9e groups=p384_ntru_hrss701 write_p=0x1 ver=0x304 content_type=22 content_type_string='handshake' handshake_type_string='finished' len=52
+Bench: type=tls_info_cb_bench rnd=b56f03f306d51a9e groups=p384_ntru_hrss701 where=0x1001 ret=0x1 clocks=14886 str=SSL_connect
+Bench: type=tls_info_cb_bench rnd=b56f03f306d51a9e groups=p384_ntru_hrss701 where=0x20 ret=0x1 clocks=14893 str=undefined
+Bench: type=tls_info_cb_bench rnd=b56f03f306d51a9e groups=p384_ntru_hrss701 where=0x1002 ret=0x1 clocks=14895 str=SSL_connect
