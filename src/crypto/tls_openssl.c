@@ -754,7 +754,7 @@ static void print_bench(void) {
 		if(benchmark_results[i][0] == 0){
 			break;
 		}
-		fprintf(stderr,"%s\n", benchmark_results[i]);
+		fprintf(stdout,"%s\n", benchmark_results[i]);
 	}
 }
 
@@ -5393,6 +5393,7 @@ static void openssl_debug_dump_certificate(int i, X509 *cert)
 		serial_num[0] = '\0';
 
 	pkey = X509_get_pubkey(cert);
+	(void)openssl_pkey_type_str;
 	wpa_printf(MSG_DEBUG, "%d: %s (%s) %s", i, buf,
 		   openssl_pkey_type_str(pkey), serial_num);
 	EVP_PKEY_free(pkey);

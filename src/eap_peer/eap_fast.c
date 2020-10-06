@@ -926,6 +926,7 @@ static int eap_fast_parse_pac_info(struct eap_fast_pac *entry, int type,
 {
 	u16 pac_type;
 	u32 lifetime;
+	(void)lifetime;
 	struct os_time now;
 
 	switch (type & 0x7fff) {

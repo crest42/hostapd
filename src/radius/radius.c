@@ -352,7 +352,7 @@ static void radius_msg_dump_attr(struct radius_attr_hdr *hdr)
 void radius_msg_dump(struct radius_msg *msg)
 {
 	size_t i;
-
+	(void)radius_code_string;
 	wpa_printf(MSG_INFO, "RADIUS message: code=%d (%s) identifier=%d length=%d",
 		   msg->hdr->code, radius_code_string(msg->hdr->code),
 		   msg->hdr->identifier, be_to_host16(msg->hdr->length));

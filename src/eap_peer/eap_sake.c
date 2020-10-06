@@ -55,6 +55,7 @@ static const char * eap_sake_state_txt(int state)
 
 static void eap_sake_state(struct eap_sake_data *data, int state)
 {
+	(void)eap_sake_state_txt;
 	wpa_printf(MSG_DEBUG, "EAP-SAKE: %s -> %s",
 		   eap_sake_state_txt(data->state),
 		   eap_sake_state_txt(state));

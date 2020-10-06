@@ -11,6 +11,7 @@
 
 #include "includes.h"
 #include <assert.h>
+#include <time.h>
 
 #include "common.h"
 #include "utils/ext_password.h"
@@ -29,6 +30,7 @@
 #include "common/wpa_ctrl.h"
 //#include "ctrl_iface.h"
 #include "pcsc_funcs.h"
+
 
 
 const struct wpa_driver_ops *const wpa_drivers[] = { NULL };
@@ -1024,10 +1026,16 @@ static int scard_test(struct eapol_test_data *e)
 	unsigned char aka_autn[AKA_AUTN_LEN];
 	unsigned char aka_auts[AKA_AUTS_LEN];
 	unsigned char aka_res[RES_MAX_LEN];
+	(void)aka_rand;
+	(void)aka_autn;
+	(void)aka_auts;
+	(void)aka_res;
 	size_t aka_res_len;
+	(void)aka_res_len;
 	unsigned char aka_ik[IK_LEN];
 	unsigned char aka_ck[CK_LEN];
-
+	(void)aka_ik;
+	(void)aka_ck;
 	scard = scard_init(e->pcsc_reader);
 	if (scard == NULL)
 		return -1;
@@ -1174,6 +1182,7 @@ static int scard_get_triplets(struct eapol_test_data *e, int argc, char *argv[])
 static void eapol_test_terminate(int sig, void *signal_ctx)
 {
 	struct wpa_supplicant *wpa_s = signal_ctx;
+	(void)wpa_s;
 	wpa_msg(wpa_s, MSG_INFO, "Signal %d received - terminating", sig);
 	eloop_terminate();
 }
@@ -1246,7 +1255,10 @@ int main(int argc, char *argv[])
 	struct extra_radius_attr *p = NULL, *p1;
 	const char *ifname = "test";
 	const char *ctrl_iface = NULL;
-
+	struct timeval wct_total_start, wct_total_end;
+	gettimeofday(&wct_total_start, NULL);
+	clock_t total_start = clock();
+	
 	if (os_program_init())
 		return -1;
 
@@ -1465,7 +1477,12 @@ int main(int argc, char *argv[])
 		printf("FAILURE\n");
 	else
 		printf("SUCCESS\n");
+	clock_t total_end = clock();
+	gettimeofday(&wct_total_end, NULL);
+	long wtc_total_start_ms = (long)wct_total_start.tv_sec * 1000 + (long)wct_total_start.tv_usec / 1000;
+	long wtc_total_end_ms = (long)wct_total_end.tv_sec * 1000 + (long)wct_total_end.tv_usec / 1000;
 
+	printf("time_total %lu %f %lu\n", total_end-total_start, ((double)(total_end-total_start))/CLOCKS_PER_SEC, wtc_total_end_ms-wtc_total_start_ms);
 	os_program_deinit();
 
 	return ret;

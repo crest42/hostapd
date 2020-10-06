@@ -2,3 +2,4 @@
 !scripts/raddb_template/policy.d
 confs
 logs
+eapol_test

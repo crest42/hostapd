@@ -16,7 +16,7 @@
  */
 
 #include "includes.h"
-
+#include <time.h>
 #include "common.h"
 #include "pcsc_funcs.h"
 #include "state_machine.h"
@@ -36,6 +36,8 @@
 #define EAP_MAX_AUTH_ROUNDS_SHORT 4000
 #define EAP_CLIENT_TIMEOUT_DEFAULT 60
 
+clock_t eap_start;
+clock_t eap_end;
 
 static bool eap_sm_allowMethod(struct eap_sm *sm, int vendor,
 			       enum eap_type method);
@@ -215,6 +217,7 @@ static int eap_sm_append_3gpp_realm(struct eap_sm *sm, char *imsi,
  */
 SM_STATE(EAP, INITIALIZE)
 {
+	eap_start = clock();
 	SM_ENTRY(EAP, INITIALIZE);
 	if (sm->fast_reauth && sm->m && sm->m->has_reauth_data &&
 	    sm->m->has_reauth_data(sm, sm->eap_method_priv) &&
@@ -1045,6 +1048,8 @@ SM_STATE(EAP, RETRANSMIT)
 SM_STATE(EAP, SUCCESS)
 {
 	struct eap_peer_config *config = eap_get_config(sm);
+	eap_end = clock();
+	printf("time_eap %lu %f 0\n", eap_end-eap_start, ((double)(eap_end-eap_start))/CLOCKS_PER_SEC);
 
 	SM_ENTRY(EAP, SUCCESS);
 	if (sm->eapKeyData != NULL)
@@ -1440,6 +1445,7 @@ static struct wpabuf * eap_sm_buildNak(struct eap_sm *sm, int id)
 {
 	struct wpabuf *resp;
 	u8 *start;
+	(void)start;
 	int found = 0, expanded_found = 0;
 	size_t count;
 	const struct eap_method *methods, *m;
