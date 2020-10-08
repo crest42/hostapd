@@ -83,6 +83,7 @@ for i, l in enumerate(dirlist):
             else:
                 continue
     elif l.endswith('.cap'):
+        continue
         capfile = f'{LOG_DIR}/{l}'
         tshark = ('tshark', '-2', '-r', capfile, '-T', 'json', '--no-duplicate-keys')
         o = subprocess.Popen(tshark, stdout=subprocess.PIPE)
@@ -95,10 +96,27 @@ for i, l in enumerate(dirlist):
     log.close()
 
 bench_df = pd.DataFrame(bench)
-msg_cb = bench_df[bench_df['type'] == 'tls_msg_cb_bench'].copy()
-info_cb = bench_df[bench_df['type'] == 'tls_info_cb_bench'].copy()
+msg_cb = bench_df[bench_df['type'] == 'tls_msg_cb_bench'].copy().dropna(axis='columns')
+info_cb = bench_df[bench_df['type'] == 'tls_info_cb_bench'].copy().dropna(axis='columns')
 msg_cb['len'] = msg_cb['len'].astype('int64')
 traffic = msg_cb.groupby(['rnd','groups']).sum().reset_index().sort_values('len')
+msg_cb['clock'] = msg_cb['clock'].astype(np.uint64)
+msg_cb['clock_delta'] = msg_cb['clock_delta'].astype(np.uint64)
+msg_cb['clock_abs'] = msg_cb['clock_abs'].astype(np.uint64)
+msg_cb['time'] = msg_cb['time'].astype(np.uint64)
+msg_cb['time_delta'] = msg_cb['time_delta'].astype(np.uint64)
+msg_cb['time_abs'] = msg_cb['time_abs'].astype(np.uint64)
+info_cb['clock'] = info_cb['clock'].astype(np.uint64)
+info_cb['clock_delta'] = info_cb['clock_delta'].astype(np.uint64)
+info_cb['clock_abs'] = info_cb['clock_abs'].astype(np.uint64)
+info_cb['time'] = info_cb['clock_delta'].astype(np.uint64)
+info_cb['time_delta'] = info_cb['time_delta'].astype(np.uint64)
+info_cb['time_abs'] = info_cb['time_abs'].astype(np.uint64)
+
+info_cb['n'] = info_cb['n'].astype(np.uint64)
+
+msg_cb['sum_len'] = msg_cb['sum_len'].astype(np.uint64)
+msg_cb['n'] = msg_cb['n'].astype(np.uint64)
 
 time_df = pd.DataFrame(time)
 time_df['clock'] = time_df['clock'].astype('float')
@@ -108,5 +126,3 @@ df_total = time_df[time_df['type'] == 'time_total']
 df_eap = time_df[time_df['type'] == 'time_eap']
 
 cap_df = pd.DataFrame(cap)
-
-print(cap_df)

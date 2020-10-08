@@ -25,6 +25,19 @@ static unsigned char groups[256];
 static char benchmark_results[512][1024];
 static int random_set = false;
 static int bcount = 0;
+static int n_info = 0;
+static int n_msg = 0;
+static size_t sum = 0;
+static struct timeval time_info_last;
+static struct timeval time_info_first;
+static struct timeval time_msg_last;
+static struct timeval time_msg_first;
+
+static long unsigned clock_msg_last = 0;
+static long unsigned clock_msg_first = 0;
+static long unsigned clock_info_last = 0;
+static long unsigned clock_info_first = 0;
+
 #include <assert.h>
 #include <openssl/ssl.h>
 #include <openssl/err.h>
@@ -760,14 +773,38 @@ static void print_bench(void) {
 
 static void tls_info_cb_bench(const SSL *ssl, int where, int ret, const char *str)
 {
+	long unsigned now = clock();
+	struct timeval time_now;
+        gettimeofday(&time_now, NULL);
 	if(!random_set) {
 		getrandom(&rnd, rnd_len, 0);
 		rnd_to_hex(rnd, hex);
 		random_set = true;
 	}
+
+	if (clock_info_first == 0) {
+		clock_info_first = now;
+		clock_info_last = now;
+		memcpy(&time_info_first, &time_now, sizeof(time_now));
+		memcpy(&time_info_last, &time_now, sizeof(time_now));
+	}
+	long unsigned clock_delta = now-clock_info_last;
+	long unsigned clock_abs = now-clock_info_first;
+	clock_info_last = now;
+
+	long unsigned time_now_usec = (time_now.tv_sec * 1000) + time_now.tv_usec;
+	long unsigned time_last_usec = (time_info_last.tv_sec * 1000) + time_info_last.tv_usec;
+	long unsigned time_first_usec = (time_info_first.tv_sec * 1000) + time_info_first.tv_usec;
+	
+	long unsigned time_delta = time_now_usec-time_last_usec; 
+	long unsigned time_abs = time_now_usec - time_first_usec;
+	memcpy(&time_info_last, &time_now, sizeof(time_now));
+
 	assert(bcount < 512);
-	sprintf(benchmark_results[bcount], "Bench: type=tls_info_cb_bench rnd=%s groups=%s where=0x%x ret=0x%x clocks=%lu str=%s", hex, groups, where, ret, clock(), str);
-	bcount++;
+	printf("Bench: type=tls_info_cb_bench n=%d rnd=%s groups=%s where=0x%x ret=0x%x clock=%lu str=%s clock_delta=%lu time_delta=%lu time=%lu time_abs=%lu clock_abs=%lu\n", n_info, hex, groups, where, ret, now, str, clock_delta, time_delta, time_now_usec, time_abs, clock_abs);
+	//sprintf(benchmark_results[bcount], "Bench: type=tls_info_cb_bench rnd=%s groups=%s where=0x%x ret=0x%x clocks=%lu str=%s", hex, groups, where, ret, clock(), str);
+	//bcount++;
+	n_info++;
 }
 
 static void ssl_info_cb(const SSL *ssl, int where, int ret)
@@ -1534,13 +1571,41 @@ static void check_server_key_exchange(SSL *ssl, struct tls_connection *conn,
 static void tls_msg_cb_bench(int write_p, int version, int content_type,
 		       const void *buf, size_t len, SSL *ssl, void *arg)
 {
+	sum += len;
+	long unsigned now = clock();
+	struct timeval time_now;
+        gettimeofday(&time_now, NULL);
 	if(!random_set) {
 		getrandom(&rnd, rnd_len, 0);
 		rnd_to_hex(rnd, hex);
 		random_set = true;
 	}
-	sprintf(benchmark_results[bcount], "Bench: type=tls_msg_cb_bench rnd=%s groups=%s write_p=0x%x ver=0x%x content_type=%d content_type_string='%s' handshake_type_string='%s' len=%lu", hex, groups, write_p, version, content_type, openssl_content_type(content_type), openssl_handshake_type(content_type, buf, len), len);
-	bcount++;
+	if (clock_msg_first == 0) {
+		clock_msg_first = now;
+		clock_msg_last = now;
+		memcpy(&time_msg_first, &time_now, sizeof(time_now));
+		memcpy(&time_msg_last, &time_now, sizeof(time_now));
+	}
+	
+
+	long unsigned clock_delta = now-clock_msg_last;
+	long unsigned clock_abs = now-clock_msg_first;
+	clock_msg_last = now;
+	
+	long unsigned time_now_usec = (time_now.tv_sec * 1000) + time_now.tv_usec;
+	long unsigned time_last_usec = (time_msg_last.tv_sec * 1000) + time_msg_last.tv_usec;
+	long unsigned time_first_usec = (time_msg_first.tv_sec * 1000) + time_msg_first.tv_usec;
+	
+	
+	long unsigned time_delta = time_now_usec - time_last_usec; 
+	long unsigned time_abs = time_now_usec - time_first_usec;
+	memcpy(&time_msg_last, &time_now, sizeof(time_now));
+
+
+	printf("Bench: type=tls_msg_cb_bench n=%d rnd=%s groups=%s write_p=0x%x ver=0x%x content_type=%d content_type_string='%s' handshake_type_string='%s' len=%lu sum_len=%lu clock=%lu clock_delta=%lu time_delta=%lu time=%lu time_abs=%lu clock_abs=%lu\n", n_msg, hex, groups, write_p, version, content_type, openssl_content_type(content_type), openssl_handshake_type(content_type, buf, len), len, sum, now, clock_delta, time_delta, time_now_usec, time_abs, clock_abs);
+	//sprintf(benchmark_results[bcount], "Bench: type=tls_msg_cb_bench rnd=%s groups=%s write_p=0x%x ver=0x%x content_type=%d content_type_string='%s' handshake_type_string='%s' len=%lu", hex, groups, write_p, version, content_type, openssl_content_type(content_type), openssl_handshake_type(content_type, buf, len), len);
+	//bcount++;
+	n_msg++;
 }
 
 static void tls_msg_cb(int write_p, int version, int content_type,
