@@ -1659,9 +1659,12 @@ network={
 	key_mgmt=IEEE8021X
 	eap=TLS
 	identity="test"
-	ca_cert="/home/robin/git/openssl-1.1.1/p256_dilithium2_CA.crt"
-	client_cert="/home/robin/git/openssl-1.1.1/p256_dilithium2_CA.crt"
-	private_key="/home/robin/git/openssl-1.1.1/p256_dilithium2_CA.key"
+#	ca_cert="/home/robin/git/openssl-1.1.1/p256_dilithium2_CA.crt"
+#	client_cert="/home/robin/git/openssl-1.1.1/p256_dilithium2_CA.crt"
+#	private_key="/home/robin/git/openssl-1.1.1/p256_dilithium2_CA.key"
+	ca_cert="/home/robin/git/openssl-1.1.1/p384_CA.crt"
+	client_cert="/home/robin/git/openssl-1.1.1/p384_CA.crt"
+	private_key="/home/robin/git/openssl-1.1.1/p384.key"
 	eapol_flags=0
 	password="testing123"
 	phase1="tls_disable_tlsv1_2=1 tls_disable_tlsv1_1=1 tls_disable_tlsv1_0=1 tls_disable_tlsv1_3=0"

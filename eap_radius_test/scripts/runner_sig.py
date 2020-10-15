@@ -30,7 +30,7 @@ def get_raddb_conf(filename):
     return raddb_conf
 
 
-runs=3
+runs=20
 for e in range(1,runs):
     for i, filename in enumerate(h_dirlist):
         if filename.endswith(".conf"):
@@ -40,23 +40,57 @@ for e in range(1,runs):
             logfile = open(logfile_name,'w')
             hconfig = f'{HOSTAPD_CONF_DIR}/{filename}'
             client = ("../eapol_test", "-c", hconfig, "-s", "testing123")
-            server = ("radiusd", "-f", '-l', "/dev/null", "-d", raddb_conf)
-            t = scapy.all.AsyncSniffer(iface='lo', filter="udp port 1812")
-            t.start()
-            sopen = subprocess.Popen(server, stdout=subprocess.DEVNULL)
-            time.sleep(0.2)
-            copen = subprocess.Popen(client, stdout=subprocess.DEVNULL,stderr=logfile)
-            streamdata = copen.communicate()[0]
-            rc = copen.wait()
-            sopen.kill()
-            time.sleep(1)
-            scapy.all.wrpcap(capfile_name,t.stop())
-            logfile.flush()
-            if rc != 0:
-                print(f"Error {filename} aborted with {rc}")
-                print(' '.join(client))
-                print(' '.join(server))
-                os.remove(logfile_name)
-                sys.exit(rc)
-                #break
-            print(f"{filename} rc: {rc} {i}/{len(h_dirlist)}")
+            server = ("radiusd", "-f", '-l', "stdout", "-d", raddb_conf)
+            tshark = ("tshark", "-q", "-i", "lo", "-w", capfile_name, "udp port 1812")
+            print(' '.join(client))
+            print(' '.join(server))
+            print(' '.join(tshark))
+            sopen = None
+            copen = None
+            tshark_open = None
+            try:
+                tshark_open = subprocess.Popen(tshark, stderr=subprocess.PIPE)
+                out = []
+                for j, line in enumerate(iter(tshark_open.stderr.readline, '')):
+                    out.append(line.decode('utf-8').rstrip())
+                    if out[-1].endswith("Capturing on 'Loopback: lo'"):
+                        break
+                    elif out[-1] == '':
+                        err = '\n'.join(out)
+                        print(f"Error while waiting for tshark: {err}")
+                        sys.exit(1)
+                sopen = subprocess.Popen(server, stdout=subprocess.PIPE)
+                out = []
+                for j, line in enumerate(iter(sopen.stdout.readline, '')):
+                    out.append(line.decode('utf-8').rstrip())
+                    if out[-1].endswith('Info: Ready to process requests'):
+                        break
+                    elif out[-1] == '':
+                        err = '\n'.join(out)
+                        print(f"Error while waiting for radiusd: {err}")
+                        sys.exit(1)
+                copen = subprocess.Popen(client, stdout=subprocess.DEVNULL,stderr=logfile)
+                streamdata = copen.communicate()[0]
+                rc = copen.wait()
+                sopen.kill()
+                tshark_open.kill()
+                sopen.wait()
+                tshark_open.wait()
+                logfile.flush()
+                if rc != 0:
+                    print(f"Error {filename} aborted with {rc}")
+                    os.remove(logfile_name)
+                    sys.exit(rc)
+                print(f"{filename} rc: {rc} {i}/{len(h_dirlist)} run: {e}/{runs}")
+            except Exception as ex:
+                print(f"Unexpected error '{ex}', kill childs")
+                if tshark_open is not None:
+                    tshark_open.kill()
+                    tshark_open.wait()
+                if sopen is not None:
+                    sopen.kill()
+                    sopen.wait()
+                if copen is not None:
+                    sopen.kill()
+                    sopen.wait()
+                sys.exit(1)

@@ -52,7 +52,7 @@ for pq_curve in PQ_L5_CURVES:
         curves.append(c)
 
 
-curves = curves + ['P-256']
+curves = curves + ['P-256', 'P-384', 'P-521']
 file_loader = FileSystemLoader('.') # directory of template file
 env = Environment(loader=file_loader)
 template = 'eap_tls_kem_template.conf.j2'

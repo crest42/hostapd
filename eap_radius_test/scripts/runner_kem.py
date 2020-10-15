@@ -17,8 +17,8 @@ if not path.exists(LOG_DIR):
 
 dirlist = os.listdir(KEM_CONF_DIR)
 stamp = int(time.time())
-runs=50
-for e in range(runs):
+RUNS=50
+for e in range(RUNS):
     for i, filename in enumerate(dirlist):
         if filename.endswith(".conf"):
             logfile = open(f'{LOG_DIR}/bench_{stamp}_{filename}_{e}_inst.log','w')
@@ -37,7 +37,7 @@ for e in range(runs):
             try:
                 tshark_open = subprocess.Popen(tshark, stderr=subprocess.PIPE)
                 out = []
-                for i, line in enumerate(iter(tshark_open.stderr.readline,'')):
+                for j, line in enumerate(iter(tshark_open.stderr.readline,'')):
                     out.append(line.decode('utf-8').rstrip())
                     if out[-1].endswith("Capturing on 'Loopback: lo'"):
                         break
@@ -47,7 +47,7 @@ for e in range(runs):
                         sys.exit(1)
                 sopen = subprocess.Popen(server, stdout=subprocess.PIPE, stderr=subprocess.DEVNULL)
                 out = []
-                for i, line in enumerate(iter(sopen.stdout.readline,'')):
+                for j, line in enumerate(iter(sopen.stdout.readline,'')):
                     out.append(line.decode('utf-8').rstrip())
                     if out[-1].endswith('Info: Ready to process requests'):
                         break
@@ -66,7 +66,7 @@ for e in range(runs):
                 if rc != 0:
                     print(f"Error in executing eapol_test. RC: {rc} Log: {logfile}")
                     sys.exit(rc)
-                print(f"{filename} rc: {rc} {i}/{len(dirlist)}")
+                print(f"{filename} rc: {rc} {i}/{len(dirlist)} Run {e}/{RUNS}")
                 print()
             except Exception as ex:
                 print(f"Got exception '{ex}', Terminate Childs")

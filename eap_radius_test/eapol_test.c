@@ -1479,10 +1479,10 @@ int main(int argc, char *argv[])
 		printf("SUCCESS\n");
 	clock_t total_end = clock();
 	gettimeofday(&wct_total_end, NULL);
-	long wtc_total_start_ms = (long)wct_total_start.tv_sec * 1000 + (long)wct_total_start.tv_usec / 1000;
-	long wtc_total_end_ms = (long)wct_total_end.tv_sec * 1000 + (long)wct_total_end.tv_usec / 1000;
+	long long wtc_total_start_us = ((long)wct_total_start.tv_sec) * 1000000 + wct_total_start.tv_usec;
+	long long wtc_total_end_us = ((long)wct_total_end.tv_sec) * 1000000 + wct_total_end.tv_usec;
 
-	printf("time_total %lu %f %lu\n", total_end-total_start, ((double)(total_end-total_start))/CLOCKS_PER_SEC, wtc_total_end_ms-wtc_total_start_ms);
+	printf("time_total %lu %f %lld\n", total_end-total_start, ((double)(total_end-total_start))/CLOCKS_PER_SEC, wtc_total_end_us-wtc_total_start_us);
 	os_program_deinit();
 
 	return ret;
