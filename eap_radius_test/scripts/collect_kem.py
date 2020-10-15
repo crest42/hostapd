@@ -35,7 +35,11 @@ def parse_time(line, algo, ts, run):
     s = line.rstrip().split(' ')
     return {'run': run, 'ts': ts, 'type': s[0], 'algo': algo,  'clock': s[1], 'cpu_time': s[2], 'wct': s[3]}
 
-def parse_cap(packets, algo, ts, run):
+def parse_cap(capfile, algo, ts, run):
+    tshark = ('tshark', '-2', '-r', capfile, '-T', 'json', '--no-duplicate-keys')
+    o = subprocess.Popen(tshark, stdout=subprocess.PIPE)
+    out = o.communicate()[0]
+    packets = json.loads(out)
     cap = []
     for x, packet in enumerate(packets):
         d  ={'algo': algo, 'ts': ts, 'run': run}
@@ -53,16 +57,32 @@ def parse_cap(packets, algo, ts, run):
         d['rad_id'] = radius['radius.id']
         avp = radius['Attribute Value Pairs']['radius.avp_tree']
         for x in avp:
+            _d = {}
             for k in x:
                 if k == 'radius.avp.type':
-                    d['rad_avp_t'] = x['radius.avp.type']
+                    _d['rad_avp_t'] = x['radius.avp.type']
                 elif k == 'radius.avp.length':
-                    d['rad_avp_len'] = x['radius.avp.length']
+                    _d['rad_avp_len'] = x['radius.avp.length']
                 else:
                     pass
                     #d['rad_avp_payload'] = x[k]
+            d['avp'] = _d
         cap.append(d)
     return cap
+
+def parse_inst(instfile, algo, ts, run):
+    log = open(instfile,'r')
+    bench = []
+    time = []
+    for line in log.readlines():
+        if line.startswith('Bench: '):
+            bench.append(parse_bench(line, algo, ts, run))
+        elif line.startswith('time_'):
+            time.append(parse_time(line, algo, ts, run))
+        else:
+            continue
+    log.close()
+    return bench, time
 
 def _parse(min=0, max=None):
     bench = []
@@ -76,26 +96,17 @@ def _parse(min=0, max=None):
             continue
         print(f'Parsing log {i}/{len(dirlist)}: {l}')
         algo, ts, run = parse_algo(l)
-        if l.endswith('_inst.log') or l.endswith('_time.log'):
-            log = open(f'{LOG_DIR}/{l}','r')
-            for line in log.readlines():
-                if line.startswith('Bench: '):
-                    bench.append(parse_bench(line, algo, ts, run))
-                elif line.startswith('time_'):
-                    time.append(parse_time(line, algo, ts, run))
-                else:
-                    continue
+        if l.endswith('_inst.log'):
+            instfile = f'{LOG_DIR}/{l}'
+            a, b = parse_inst(instfile, algo, ts, run)
+            bench += a
+            time += b
         elif l.endswith('.cap'):
             capfile = f'{LOG_DIR}/{l}'
-            tshark = ('tshark', '-2', '-r', capfile, '-T', 'json', '--no-duplicate-keys')
-            o = subprocess.Popen(tshark, stdout=subprocess.PIPE)
-            out = o.communicate()[0]
-            out = json.loads(out)
-            cap += parse_cap(out, algo, ts, run)
+            cap += parse_cap(capfile, algo, ts, run)
         else:
             print(f"Error unknown log {l}")
             sys.exit(1)
-        log.close()
 
     bench_df = pd.DataFrame(bench)
     msg_cb = bench_df[bench_df['type'] == 'tls_msg_cb_bench'].copy().dropna(axis='columns')
