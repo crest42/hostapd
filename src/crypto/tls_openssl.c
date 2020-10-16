@@ -1581,7 +1581,7 @@ static void tls_msg_cb_bench(int write_p, int version, int content_type,
 	sum += len;
 	long unsigned now = clock();
 	struct timespec time_now;
-        clock_gettime(CLOCK_MONOTONIC_RAW, &time_now);
+        clock_gettime(CLOCK_MONOTONIC, &time_now);
 	if(!random_set) {
 		getrandom(&rnd, rnd_len, 0);
 		rnd_to_hex(rnd, hex);

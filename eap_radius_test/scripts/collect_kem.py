@@ -1,5 +1,5 @@
+import time
 import shlex
-import pprint
 import pandas as pd
 import os
 import seaborn
@@ -41,6 +41,7 @@ def parse_cap(capfile, algo, ts, run):
     out = o.communicate()[0]
     packets = json.loads(out)
     cap = []
+    tls = []
     for x, packet in enumerate(packets):
         d  ={'algo': algo, 'ts': ts, 'run': run}
         #d['index'] = packet['_index']
@@ -57,17 +58,61 @@ def parse_cap(capfile, algo, ts, run):
         d['rad_id'] = radius['radius.id']
         avp = radius['Attribute Value Pairs']['radius.avp_tree']
         for x in avp:
-            _d = {}
+            cont = False
+            _d = d.copy()
             for k in x:
                 if k == 'radius.avp.type':
                     _d['rad_avp_t'] = x['radius.avp.type']
                 elif k == 'radius.avp.length':
                     _d['rad_avp_len'] = x['radius.avp.length']
+                elif k == 'eap':
+                    _d['eap.id'] = x[k]['eap.id']
+                    _d['eap.code'] = x[k]['eap.code']
+                    _d['eap.len'] = x[k]['eap.len']
+                    if 'eap.type' in x[k]:
+                        _d['eap.type'] = x[k]['eap.type']
+                    if 'tls' in x[k]:
+                        if not isinstance(x[k]['tls'],str):
+                            for _k in x[k]['tls']:
+                                if _k == 'tls.record':
+                                    records = x[k]['tls'][_k]
+                                    if isinstance(records, dict):
+                                        records = [records]
+                                    for i, record in enumerate(records):
+                                        __d = _d.copy()
+                                        for field in record:
+                                            if field == 'tls.record.version':
+                                                __d['tls.record.version'] = record['tls.record.version'] 
+                                            elif field == 'tls.record.opaque_type':
+                                                __d['tls.record.content_type'] = record['tls.record.opaque_type']
+                                            elif field == 'tls.record.content_type':
+                                                __d['tls.record.content_type'] = record['tls.record.content_type']
+                                            elif field == 'tls.record.length':
+                                                __d['tls.record.length'] =  record['tls.record.length']
+                                            elif field == 'tls.handshake':
+                                                if 'tls.handshake.type' in record[field]:
+                                                    __d['tls.handshake.type'] = record[field]['tls.handshake.type']
+                                                if 'tls.handshake.length' in record[field]:
+                                                    __d['tls.handshake.length'] = record[field]['tls.handshake.length']
+                                            else:
+                                                pass
+                                        if 'tls.handshake.type' in __d:
+                                            __d['tls_real_type'] = __d['tls.handshake.type']
+                                        elif 'tls.record.opaque_type' in __d:
+                                            __d['tls_real_type'] = __d['tls.record.opaque_type']
+                                        else:
+                                            __d['tls_real_type'] = __d['tls.record.content_type']
+                                        cap.append(__d)
+                                        cont = True
+                                else:
+                                    print(d['frame_nr'])
+                                    pprint.pprint(x[k])
+
                 else:
                     pass
                     #d['rad_avp_payload'] = x[k]
-            d['avp'] = _d
-        cap.append(d)
+            if not cont:
+                cap.append(_d)
     return cap
 
 def parse_inst(instfile, algo, ts, run):
@@ -135,7 +180,6 @@ def _parse(min=0, max=None):
     time_df['wct'] = time_df['wct'].astype('float')
     df_total = time_df[time_df['type'] == 'time_total']
     df_eap = time_df[time_df['type'] == 'time_eap']
-
     cap_df = pd.DataFrame(cap)
     return msg_cb.reset_index().drop(['index', 'type'], axis=1), info_cb.reset_index().drop(['index','type'],axis=1), df_total, df_eap, cap_df
 

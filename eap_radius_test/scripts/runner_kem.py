@@ -22,7 +22,7 @@ for e in range(RUNS):
     for i, filename in enumerate(dirlist):
         if filename.endswith(".conf"):
             logfile = open(f'{LOG_DIR}/bench_{stamp}_{filename}_{e}_inst.log','w')
-            logfile_t = open(f'{LOG_DIR}/bench_{stamp}_{filename}_{e}_time.log','w')
+            #logfile_t = open(f'{LOG_DIR}/bench_{stamp}_{filename}_{e}_time.log','w')
             capfile_name = f'{LOG_DIR}/bench_{stamp}_{filename}_{e}_cap.cap'
             path = f'{KEM_CONF_DIR}{filename}'
             client = ("../eapol_test", "-c", path, "-s", "testing123")
@@ -55,7 +55,7 @@ for e in range(RUNS):
                         err = '\n'.join(out)
                         print(f"Error while waiting for successfull freeradius startup {err}")
                         sys.exit(1)
-                copen = subprocess.Popen(client, stdout=logfile, stderr=logfile_t)
+                copen = subprocess.Popen(client, stdout=logfile, stderr=subprocess.DEVNULL)
                 streamdata = copen.communicate()[0]
                 rc = copen.wait()
                 sopen.kill()
