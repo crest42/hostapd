@@ -8,3 +8,4 @@ ax = sns.boxplot(data=data, y='groups', x=x, hue='handshake_type_string', order=
 ax.set(xlabel='Time in usec', ylabel='Algorithm')
 plt.tight_layout()
 savefig(__file__)
+#plt.show()

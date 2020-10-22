@@ -9,4 +9,4 @@ ax.set(xlabel='CPU Cycles', ylabel='Algorithm')
 plt.tight_layout()
 savefig(__file__)
 
-plt.show()
+#plt.show()

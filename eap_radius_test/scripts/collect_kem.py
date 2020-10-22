@@ -104,6 +104,8 @@ def parse_cap(capfile, algo, ts, run):
                                             __d['tls_real_type'] = __d['tls.record.content_type']
                                         cap.append(__d)
                                         cont = True
+                                elif _k == 'Ignored Unknown Record':
+                                    pass
                                 else:
                                     print(d['frame_nr'])
                                     pprint.pprint(x[k])
@@ -143,7 +145,9 @@ def _parse(min=0, max=None):
         algo, ts, run = parse_algo(l)
         if l.endswith('_inst.log'):
             instfile = f'{LOG_DIR}/{l}'
-            a, b = parse_inst(instfile, algo, ts, run)
+            #a, b = parse_inst(instfile, algo, ts, run)
+            a = []
+            b = []
             bench += a
             time += b
         elif l.endswith('.cap'):
@@ -154,34 +158,56 @@ def _parse(min=0, max=None):
             sys.exit(1)
 
     bench_df = pd.DataFrame(bench)
-    msg_cb = bench_df[bench_df['type'] == 'tls_msg_cb_bench'].copy().dropna(axis='columns')
-    msg_cb['len'] = msg_cb['len'].astype('int64')
-    msg_cb['clock'] = msg_cb['clock'].astype(float)
-    msg_cb['clock_delta'] = msg_cb['clock_delta'].astype(float)
-    msg_cb['clock_abs'] = msg_cb['clock_abs'].astype(float)
-    msg_cb['time'] = msg_cb['time'].astype(float)
-    msg_cb['time_delta'] = msg_cb['time_delta'].astype(float)
-    msg_cb['time_abs'] = msg_cb['time_abs'].astype(float)
-    msg_cb['sum_len'] = msg_cb['sum_len'].astype(float)
-    msg_cb['n'] = msg_cb['n'].astype(int)
+    df_total = None
+    df_eap = None
+    info_cb = None
+    msg_cb = None
+    
+    if len(bench_df) > 0:
+        msg_cb = bench_df[bench_df['type'] == 'tls_msg_cb_bench'].copy().dropna(axis='columns')
+        msg_cb['len'] = msg_cb['len'].astype('int64')
+        msg_cb['clock'] = msg_cb['clock'].astype(float)
+        msg_cb['clock_delta'] = msg_cb['clock_delta'].astype(float)
+        msg_cb['clock_abs'] = msg_cb['clock_abs'].astype(float)
+        msg_cb['time'] = msg_cb['time'].astype(float)
+        msg_cb['time_delta'] = msg_cb['time_delta'].astype(float)
+        msg_cb['time_abs'] = msg_cb['time_abs'].astype(float)
+        msg_cb['sum_len'] = msg_cb['sum_len'].astype(float)
+        msg_cb['n'] = msg_cb['n'].astype(int)
+        msg_cb = msg_cb.reset_index().drop(['index', 'type'], axis = 1)
 
-    info_cb = bench_df[bench_df['type'] == 'tls_info_cb_bench'].copy().dropna(axis='columns')
-    info_cb['clock'] = info_cb['clock'].astype(float)
-    info_cb['clock_delta'] = info_cb['clock_delta'].astype(float)
-    info_cb['clock_abs'] = info_cb['clock_abs'].astype(float)
-    info_cb['time'] = info_cb['clock_delta'].astype(float)
-    info_cb['time_delta'] = info_cb['time_delta'].astype(float)
-    info_cb['time_abs'] = info_cb['time_abs'].astype(float)
-    info_cb['n'] = info_cb['n'].astype(float)
+        info_cb = bench_df[bench_df['type'] == 'tls_info_cb_bench'].copy().dropna(axis='columns')
+        info_cb['clock'] = info_cb['clock'].astype(float)
+        info_cb['clock_delta'] = info_cb['clock_delta'].astype(float)
+        info_cb['clock_abs'] = info_cb['clock_abs'].astype(float)
+        info_cb['time'] = info_cb['clock_delta'].astype(float)
+        info_cb['time_delta'] = info_cb['time_delta'].astype(float)
+        info_cb['time_abs'] = info_cb['time_abs'].astype(float)
+        info_cb['n'] = info_cb['n'].astype(float)
+        info_cb = info_cb.reset_index().drop(['index', 'type'], axis = 1)
 
     time_df = pd.DataFrame(time)
-    time_df['clock'] = time_df['clock'].astype('float')
-    time_df['cpu_time'] = time_df['cpu_time'].astype('float')
-    time_df['wct'] = time_df['wct'].astype('float')
-    df_total = time_df[time_df['type'] == 'time_total']
-    df_eap = time_df[time_df['type'] == 'time_eap']
+    if len(time_df) > 0:
+        time_df['clock'] = time_df['clock'].astype('float')
+        time_df['cpu_time'] = time_df['cpu_time'].astype('float')
+        time_df['wct'] = time_df['wct'].astype('float')
+        df_total = time_df[time_df['type'] == 'time_total']
+        df_eap = time_df[time_df['type'] == 'time_eap']
+    
     cap_df = pd.DataFrame(cap)
-    return msg_cb.reset_index().drop(['index', 'type'], axis=1), info_cb.reset_index().drop(['index','type'],axis=1), df_total, df_eap, cap_df
+    if len(cap_df) > 0:
+        cap_df['frame_nr'] = cap_df['frame_nr'].astype(int)
+        cap_df['ts'] = cap_df['ts'].astype(int)
+        cap_df['run'] = cap_df['run'].astype(int)
+        cap_df['time'] = pd.to_datetime(cap_df['time'])
+        cap_df['time_delta'] = cap_df['time_delta'].astype(float)
+        cap_df['frame_len'] = cap_df['frame_len'].astype(int)
+        cap_df['rad_len'] = cap_df['rad_len'].astype(int)
+        cap_df['rad_avp_len'] = cap_df['rad_avp_len'].astype(int)
+        cap_df['eap.len'] = cap_df['eap.len'].astype(float)
+        cap_df['tls.record.length'] = cap_df['tls.record.length'].astype(float)
+        cap_df['tls.handshake.length'] = cap_df['tls.handshake.length'].astype(float)
+    return msg_cb, info_cb, df_total, df_eap, cap_df
 
 
 def main(load=None, store=None):
@@ -195,11 +221,16 @@ def main(load=None, store=None):
     else:
         (msg_cb, info_cb, df_total, df_eap, cap_df) = _parse()
     if store is not None:
-        msg_cb.to_pickle("./pkl/msg_cb.pkl")
-        info_cb.to_pickle("./pkl/info_cb.pkl")
-        df_total.to_pickle("./pkl/df_total.pkl")
-        df_eap.to_pickle("./pkl/df_eap.pkl")
-        cap_df.to_pickle("./pkl/cap_df.pkl")
+        if msg_cb is not None:
+            msg_cb.to_pickle("./pkl/msg_cb.pkl")
+        if info_cb is not None:
+            info_cb.to_pickle("./pkl/info_cb.pkl")
+        if df_total is not None:
+            df_total.to_pickle("./pkl/df_total.pkl")
+        if df_eap is not None:
+            df_eap.to_pickle("./pkl/df_eap.pkl")
+        if cap_df is not None:
+            cap_df.to_pickle("./pkl/cap_df.pkl")
     
     return (msg_cb, info_cb, df_total, df_eap, cap_df)
 
@@ -249,10 +280,12 @@ def add_sec_level(df, x):
     df['pq_algo'] = ['_'.join(xv[1:]) if c else yv for c, xv, yv in zip(df['hybrid'] == True, df[x].str.split('_'), df[x])]
     df['sec_level'] = [1 if a in PQ_L1_CURVES else 3 if a in PQ_L3_CURVES else 5 for a in df['pq_algo']]
     return df
-
-df_total = add_sec_level(df_total, 'algo')
-df_eap = add_sec_level(df_eap, 'algo')
-msg_cb = add_sec_level(msg_cb, 'groups')
-msg_cb['rutime'] = msg_cb['rutime'].astype(float)
-msg_cb['rstime'] = msg_cb['rstime'].astype(float)
+if df_total is not None:
+    df_total = add_sec_level(df_total, 'algo')
+if df_eap is not None:
+    df_eap = add_sec_level(df_eap, 'algo')
+if msg_cb is not None:
+    msg_cb = add_sec_level(msg_cb, 'groups')
+    msg_cb['rutime'] = msg_cb['rutime'].astype(float)
+    msg_cb['rstime'] = msg_cb['rstime'].astype(float)
 

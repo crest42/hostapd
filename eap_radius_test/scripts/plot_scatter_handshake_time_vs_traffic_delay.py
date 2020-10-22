@@ -11,9 +11,9 @@ _100ms = pd.read_pickle('./pkl/msg_cb_100ms.pkl')
 _100ms['delay'] = '100ms'
 tidy = pd.concat([_0ms, _1ms,_10ms,_100ms])
 tidy = add_sec_level(tidy,'groups')
-tidy = tidy[tidy['sec_level'] == 3].groupby(['rnd']).last().reset_index().sort_values(x)
+tidy = tidy.groupby(['rnd']).last().reset_index().sort_values(x)
 
-ax = sns.scatterplot(data=tidy, y='time_abs', x=x, hue='delay')
+ax = sns.scatterplot(data=tidy, y='time_abs', x=x, hue='delay', hue_order=['0ms', '1ms', '10ms', '100ms'])
 ax.set(xlabel='Bytes RX+TX', ylabel='Wall-Clock Runtime')
 #plt.tight_layout()
 #ax.set_xscale('log')
