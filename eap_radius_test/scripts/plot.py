@@ -1,4 +1,5 @@
 import seaborn as sns
+from scipy import stats
 from collect_kem import *
 import matplotlib.pyplot as plt
 import matplotlib as mpl
@@ -27,3 +28,14 @@ def savefig(name):
     path = f"{PLOT_PATH}/{get_real_name(name)}"
     print(path)
     plt.savefig(path)
+
+
+def ttest(data1, data2, x, y='algo'):
+    algos = set(data1[y]).intersection(set(data2[y]))
+    res  = {}
+    for algo in algos:
+        set1 = np.array(data1[data1[y] == algo][x])
+        set2 = np.array(data2[data2[y] == algo][x])
+        res[algo] = stats.ttest_ind(set1,set2)
+    return res
+

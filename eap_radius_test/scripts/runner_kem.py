@@ -2,12 +2,13 @@ import os
 import subprocess
 import time
 import sys
+import signal
 from os import path, makedirs, getcwd
 
 i = 0
 KEM_CONF_DIR='../confs/kem/'
 LOG_BASE_DIR='../logs'
-LOG_DIR=f'{LOG_BASE_DIR}/kem'
+LOG_DIR=f'{LOG_BASE_DIR}/kem_static'
 
 if not path.exists(LOG_BASE_DIR):
     makedirs(LOG_BASE_DIR)
@@ -17,7 +18,7 @@ if not path.exists(LOG_DIR):
 
 dirlist = os.listdir(KEM_CONF_DIR)
 stamp = int(time.time())
-RUNS=50
+RUNS=100
 for e in range(RUNS):
     for i, filename in enumerate(dirlist):
         if filename.endswith(".conf"):
@@ -27,7 +28,7 @@ for e in range(RUNS):
             path = f'{KEM_CONF_DIR}{filename}'
             client = ("../eapol_test", "-c", path, "-s", "testing123")
             server = ("radiusd", "-f", '-l', "stdout", "-d", '/home/robin/git/freeradius-server/raddb_pq')
-            tshark = ("tshark", '-q', "-i", "lo", "-w", capfile_name, 'udp port 1812')
+            tshark = ("dumpcap", '-q', "-i", "lo", "-w", capfile_name)
             print(' '.join(client))
             print(' '.join(server))
             print(' '.join(tshark))
@@ -39,7 +40,7 @@ for e in range(RUNS):
                 out = []
                 for j, line in enumerate(iter(tshark_open.stderr.readline,'')):
                     out.append(line.decode('utf-8').rstrip())
-                    if out[-1].endswith("Capturing on 'Loopback: lo'"):
+                    if out[-1].endswith(f"File: {capfile_name}"):
                         break
                     elif out[-1] == '':
                         err = '\n'.join(out)
@@ -58,11 +59,13 @@ for e in range(RUNS):
                 copen = subprocess.Popen(client, stdout=logfile, stderr=subprocess.DEVNULL)
                 streamdata = copen.communicate()[0]
                 rc = copen.wait()
-                sopen.kill()
-                tshark_open.kill()
+                sopen.send_signal(signal.SIGINT)
                 sopen.wait()
+                time.sleep(0.2)
+                tshark_open.send_signal(signal.SIGINT)
                 tshark_open.wait()
                 logfile.flush()
+
                 if rc != 0:
                     print(f"Error in executing eapol_test. RC: {rc} Log: {logfile}")
                     sys.exit(rc)

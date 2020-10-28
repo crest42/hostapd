@@ -1,8 +1,7 @@
 from plot import *
 
-merge = merge[merge['hybrid'] == False]
-merge = merge[merge['algo'] != 'P-384']
-tmp = cap_df[['algo', 'avp_count', 'rad_avp_t', 'rad_avp_len', 'rad_code']].groupby(['algo', 'rad_code', 'rad_avp_t']).sum().reset_index().sort_values('rad_avp_len')
+#tmp = cap_df[['algo', 'avp_count', 'rad_avp_t', 'rad_avp_len', 'rad_code']].groupby(['algo', 'rad_code', 'rad_avp_t']).sum().reset_index().sort_values('rad_avp_len')
+tmp = cap_df[['algo', 'run', 'frame_count', 'avp_count', 'rad_avp_t', 'rad_avp_len', 'rad_code']].groupby(['algo', 'run', 'frame_count', 'avp_count']).first().reset_index().groupby(['algo', 'run', 'rad_code', 'rad_avp_t']).sum().reset_index().sort_values('rad_avp_len')
 tmp = tmp[tmp['rad_avp_t']  != '79']
 tmp['rad_avp_t_long'] = None
 tmp['rad_code_long'] = None
