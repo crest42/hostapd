@@ -7,6 +7,6 @@ tidy = new_df[new_df['sec_level'] == 3].groupby(['algo','type','run']).last().re
 ax = sns.boxplot(data=tidy, y='algo', x=x, hue='type')
 ax.set(xlabel='CPU Cycles', ylabel='Algorithm')
 plt.tight_layout()
-savefig(__file__)
+#savefig(__file__)
 
-#plt.show()
+plt.show()

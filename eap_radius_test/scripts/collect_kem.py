@@ -113,7 +113,7 @@ def parse_cap(capfile, algo, ts, run):
                 elif k == 'eap':
                     if _x == 0:
                         assert(x[k]['eap.code'] == '2' and x[k]['eap.type'] == '1')
-                    if _x == len(packets):
+                    if _x == len(packets)-1:
                         assert(x[k]['eap.code'] == '3')
                     _d = __parse_eap(x[k], _d)
                     if 'tls' in x[k]:

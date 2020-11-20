@@ -18,7 +18,8 @@ PQ_L3_CURVES = ["bike1l3cpa", "bike1l3fo",
                "kyber768", "kyber90s768",
                "ntru_hps2048677", "ntru_hrss701",
                "saber",
-               "sidhp610", "sikep610", ]
+               "sidhp610", "sikep610",
+               "ntrulpr761", "sntrup761",]
 
 
 PQ_L5_CURVES = ["frodo1344aes", "frodo1344shake",
@@ -34,6 +35,7 @@ ECDH_L5_CURVES = ['p521']
 
 
 for pq_curve in PQ_L1_CURVES:
+    continue
     curves.append(pq_curve)
     for ecdh_curve in ECDH_L1_CURVES:
         c = f"{ecdh_curve}_{pq_curve}"
@@ -46,13 +48,15 @@ for pq_curve in PQ_L3_CURVES:
         curves.append(c)
 
 for pq_curve in PQ_L5_CURVES:
+    continue
     curves.append(pq_curve)
     for ecdh_curve in ECDH_L5_CURVES:
         c = f"{ecdh_curve}_{pq_curve}"
         curves.append(c)
 
 
-curves = curves + ['P-256', 'P-384', 'P-521']
+#curves = curves + ['P-256', 'P-384', 'P-521']
+curves = curves + ['P-384']
 file_loader = FileSystemLoader('.') # directory of template file
 env = Environment(loader=file_loader)
 template = 'eap_tls_kem_template.conf.j2'
