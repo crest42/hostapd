@@ -56,14 +56,17 @@ def create_raddb(certfile, keyfile, sig, template):
     f.close()
 
 sigs = []
-PQ_L1_SIG = ['dilithium2','falcon512','picnicl1full','picnic3l1','rainbowIaclassic' ,'sphincsharaka128frobust']
-PQ_L1_SIG_DISABLED = ['picnicl1fs','picnicl1ur', 'rainbowIacyclic','rainbowIacycliccompressed','sphincsharaka128fsimple','sphincsharaka128srobust','sphincsharaka128ssimple','sphincssha256128frobust','sphincssha256128fsimple','sphincssha256128srobust','sphincssha256128ssimple','sphincsshake256128frobust','sphincsshake256128fsimple','sphincsshake256128srobust', 'sphincsshake256128ssimple']
-PQ_L3_SIG = ['dilithium3','dilithium4','picnic3l3','rainbowIIIcclassic', 'rainbowIIIccyclic', 'rainbowIIIccycliccompressed','sphincsharaka192frobust','sphincsharaka192fsimple','sphincsharaka192srobust','sphincsharaka192ssimple','sphincssha256192frobust','sphincssha256192fsimple','sphincssha256192srobust','sphincssha256192ssimple','sphincsshake256192frobust', 'sphincsshake256192fsimple', 'sphincsshake256192srobust', 'sphincsshake256192ssimple']
+PQ_L1_SIG = []
+#PQ_L1_SIG = ['dilithium2','falcon512','picnicl1full','picnic3l1','rainbowIaclassic' ,'sphincsharaka128frobust']
+#PQ_L1_SIG_DISABLED = ['picnicl1fs','picnicl1ur', 'rainbowIacyclic','rainbowIacycliccompressed','sphincsharaka128fsimple','sphincsharaka128srobust','sphincsharaka128ssimple','sphincssha256128frobust','sphincssha256128fsimple','sphincssha256128srobust','sphincssha256128ssimple','sphincsshake256128frobust','sphincsshake256128fsimple','sphincsshake256128srobust', 'sphincsshake256128ssimple']
+PQ_L3_SIG = ['dilithium4','picnic3l3','rainbowIIIcclassic', 'rainbowIIIccyclic', 'rainbowIIIccycliccompressed','sphincsharaka192frobust','sphincsharaka192fsimple','sphincsharaka192srobust','sphincsharaka192ssimple','sphincssha256192frobust','sphincssha256192fsimple','sphincssha256192srobust','sphincssha256192ssimple','sphincsshake256192frobust', 'sphincsshake256192fsimple', 'sphincsshake256192srobust', 'sphincsshake256192ssimple']
+PQ_L3_SIG_DISABLED = ['dilithium3']
 
 
-PQ_L5_SIG = ['falcon1024','rainbowVcclassic']
-PQ_L5_SIG_DISABLED = ['picnic3l5','rainbowVccyclic', 'rainbowVccycliccompressed','sphincsharaka256frobust','sphincsharaka256fsimple','sphincsharaka256srobust','sphincsharaka256ssimple','sphincssha256256frobust','sphincssha256256fsimple','sphincssha256256srobust','sphincssha256256ssimple','sphincsshake256256frobust','sphincsshake256256fsimple', 'sphincsshake256256srobust','sphincsshake256256ssimple']
-CLASSIC_L1_SIG = ['rsa3072','p256']
+PQ_L5_SIG = []
+PQ_L5_SIG = ['falcon1024']
+#PQ_L5_SIG_DISABLED = ['rainbowVcclassic', 'picnic3l5','rainbowVccyclic', 'rainbowVccycliccompressed','sphincsharaka256frobust','sphincsharaka256fsimple','sphincsharaka256srobust','sphincsharaka256ssimple','sphincssha256256frobust','sphincssha256256fsimple','sphincssha256256srobust','sphincssha256256ssimple','sphincsshake256256frobust','sphincsshake256256fsimple', 'sphincsshake256256srobust','sphincsshake256256ssimple']
+#CLASSIC_L1_SIG = ['rsa3072','p256']
 CLASSIC_L3_SIG = ['p384']
 CLASSIC_L5_SIG = ['p521']
 
@@ -75,9 +78,9 @@ for pq_sig in PQ_L1_SIG:
 
 
 
-for pq_sig in PQ_L5_SIG:
+for pq_sig in PQ_L3_SIG:
     sigs.append(pq_sig)
-    for classical_sig in CLASSIC_L5_SIG:
+    for classical_sig in CLASSIC_L3_SIG:
         c = f"{classical_sig}_{pq_sig}"
         sigs.append(c)
 

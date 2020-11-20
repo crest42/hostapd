@@ -46,7 +46,7 @@ for e in range(RUNS):
                         err = '\n'.join(out)
                         print(f"Error while waiting for successfull tshark startup {err}")
                         sys.exit(1)
-                sopen = subprocess.Popen(server, stdout=subprocess.PIPE, stderr=subprocess.DEVNULL)
+                sopen = subprocess.Popen(server, stdout=subprocess.PIPE)
                 out = []
                 for j, line in enumerate(iter(sopen.stdout.readline,'')):
                     out.append(line.decode('utf-8').rstrip())

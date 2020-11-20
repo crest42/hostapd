@@ -3,10 +3,12 @@ import subprocess
 import time
 import sys
 import scapy.all
+import signal
 
-HOSTAPD_CONF_DIR='../confs/sig/hostapd/'
-RADDB_CONF_DIR='../confs/sig/raddb/'
-LOG_DIR='../logs/sig/'
+LOG_BASE_DIR = '../logs'
+HOSTAPD_CONF_DIR = '../confs/sig/hostapd/'
+RADDB_CONF_DIR = '../confs/sig/raddb/'
+LOG_DIR = f'{LOG_BASE_DIR}/sig_0ms/'
 if not os.path.exists(LOG_DIR):
     os.makedirs(LOG_DIR)  
 h_dirlist = os.listdir(HOSTAPD_CONF_DIR)
@@ -30,7 +32,7 @@ def get_raddb_conf(filename):
     return raddb_conf
 
 
-runs=20
+runs=100
 for e in range(1,runs):
     for i, filename in enumerate(h_dirlist):
         if filename.endswith(".conf"):
@@ -41,7 +43,7 @@ for e in range(1,runs):
             hconfig = f'{HOSTAPD_CONF_DIR}/{filename}'
             client = ("../eapol_test", "-c", hconfig, "-s", "testing123")
             server = ("radiusd", "-f", '-l', "stdout", "-d", raddb_conf)
-            tshark = ("tshark", "-q", "-i", "lo", "-w", capfile_name, "udp port 1812")
+            tshark = ("dumpcap", "-q", "-i", "lo", "-w", capfile_name)
             print(' '.join(client))
             print(' '.join(server))
             print(' '.join(tshark))
@@ -53,7 +55,7 @@ for e in range(1,runs):
                 out = []
                 for j, line in enumerate(iter(tshark_open.stderr.readline, '')):
                     out.append(line.decode('utf-8').rstrip())
-                    if out[-1].endswith("Capturing on 'Loopback: lo'"):
+                    if out[-1].endswith(f"File: {capfile_name}"):
                         break
                     elif out[-1] == '':
                         err = '\n'.join(out)
@@ -69,12 +71,13 @@ for e in range(1,runs):
                         err = '\n'.join(out)
                         print(f"Error while waiting for radiusd: {err}")
                         sys.exit(1)
-                copen = subprocess.Popen(client, stdout=subprocess.DEVNULL,stderr=logfile)
+                copen = subprocess.Popen(client, stderr=subprocess.DEVNULL,stdout=logfile)
                 streamdata = copen.communicate()[0]
                 rc = copen.wait()
-                sopen.kill()
-                tshark_open.kill()
+                sopen.send_signal(signal.SIGINT)
                 sopen.wait()
+                time.sleep(0.5)
+                tshark_open.send_signal(signal.SIGINT)
                 tshark_open.wait()
                 logfile.flush()
                 if rc != 0:
@@ -84,9 +87,9 @@ for e in range(1,runs):
                 print(f"{filename} rc: {rc} {i}/{len(h_dirlist)} run: {e}/{runs}")
             except Exception as ex:
                 print(f"Unexpected error '{ex}', kill childs")
-                if tshark_open is not None:
-                    tshark_open.kill()
-                    tshark_open.wait()
+                #if tshark_open is not None:
+                #    tshark_open.kill()
+                #    tshark_open.wait()
                 if sopen is not None:
                     sopen.kill()
                     sopen.wait()
