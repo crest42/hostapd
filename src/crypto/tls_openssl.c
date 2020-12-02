@@ -34,9 +34,9 @@ static struct timespec time_info_last;
 static struct timespec time_msg_last;
 static struct timespec time_first;
 static struct rusage rusage;
-static long unsigned clock_msg_last = 0;
-static long unsigned clock_first = 0;
-static long unsigned clock_info_last = 0;
+static long long unsigned clock_msg_last = 0;
+static long long unsigned clock_first = 0;
+static long long unsigned clock_info_last = 0;
 
 #include <assert.h>
 #include <openssl/ssl.h>
@@ -92,11 +92,15 @@ typedef int stack_index_t;
      (defined(LIBRESSL_VERSION_NUMBER) && \
       LIBRESSL_VERSION_NUMBER < 0x20700000L)) && \
     !defined(BORINGSSL_API_VERSION)
+
+
+
 /*
  * SSL_get_client_random() and SSL_get_server_random() were added in OpenSSL
  * 1.1.0 and newer BoringSSL revisions. Provide compatibility wrappers for
  * older versions.
  */
+
 
 static size_t SSL_get_client_random(const SSL *ssl, unsigned char *out,
 				    size_t outlen)
@@ -133,6 +137,11 @@ static size_t SSL_SESSION_get_master_key(const SSL_SESSION *session,
 #endif /* OPENSSL_NEED_EAP_FAST_PRF */
 
 #endif
+static long long unsigned _clock(void) {
+	struct timespec now;
+        clock_gettime(CLOCK_PROCESS_CPUTIME_ID, &now);
+	return  (now.tv_sec * 1000000000) + now.tv_nsec;
+}
 
 #if OPENSSL_VERSION_NUMBER < 0x10100000L || \
 	(defined(LIBRESSL_VERSION_NUMBER) && \
@@ -773,7 +782,7 @@ static void print_bench(void) {
 
 static void tls_info_cb_bench(const SSL *ssl, int where, int ret, const char *str)
 {
-	long unsigned now = clock();
+	long long unsigned now = _clock();
 	struct timespec time_now;
         clock_gettime(CLOCK_MONOTONIC, &time_now);
 	if(!random_set) {
@@ -786,8 +795,8 @@ static void tls_info_cb_bench(const SSL *ssl, int where, int ret, const char *st
 		clock_info_last = now;
 		memcpy(&time_info_last, &time_now, sizeof(time_now));
 	}
-	long unsigned clock_delta = now-clock_info_last;
-	long unsigned clock_abs = now-clock_first;
+	long long unsigned clock_delta = now-clock_info_last;
+	long long unsigned clock_abs = now-clock_first;
 	clock_info_last = now;
 
 	long long time_now_nsec = (time_now.tv_sec * 1000000000) + time_now.tv_nsec;
@@ -803,7 +812,7 @@ static void tls_info_cb_bench(const SSL *ssl, int where, int ret, const char *st
 	long long unsigned rstime = (rusage.ru_stime.tv_sec*1000000) + rusage.ru_stime.tv_usec;
 
 	assert(bcount < 512);
-	printf("Bench: type=tls_info_cb_bench n=%d rnd=%s groups=%s where=0x%x ret=0x%x clock=%lu str=%s clock_delta=%lu time_delta=%lld time=%lld time_abs=%lld clock_abs=%ld rutime=%llu rstime=%llu\n", n_info, hex, groups, where, ret, now, str, clock_delta, time_delta, time_now_nsec, time_abs, clock_abs, rutime, rstime);
+	printf("Bench: type=tls_info_cb_bench n=%d rnd=%s groups=%s where=0x%x ret=0x%x clock=%llu str=%s clock_delta=%llu time_delta=%lld time=%lld time_abs=%lld clock_abs=%llu rutime=%llu rstime=%llu\n", n_info, hex, groups, where, ret, now, str, clock_delta, time_delta, time_now_nsec, time_abs, clock_abs, rutime, rstime);
 	//sprintf(benchmark_results[bcount], "Bench: type=tls_info_cb_bench rnd=%s groups=%s where=0x%x ret=0x%x clocks=%lu str=%s", hex, groups, where, ret, clock(), str);
 	//bcount++;
 	n_info++;
@@ -1579,7 +1588,7 @@ static void tls_msg_cb_bench(int write_p, int version, int content_type,
 		       const void *buf, size_t len, SSL *ssl, void *arg)
 {
 	sum += len;
-	long unsigned now = clock();
+	long long unsigned now = _clock();
 	struct timespec time_now;
         clock_gettime(CLOCK_MONOTONIC, &time_now);
 	if(!random_set) {
@@ -1595,8 +1604,8 @@ static void tls_msg_cb_bench(int write_p, int version, int content_type,
 	}
 	
 
-	long unsigned clock_delta = now-clock_msg_last;
-	long unsigned clock_abs = now-clock_first;
+	long long unsigned clock_delta = now-clock_msg_last;
+	long long unsigned clock_abs = now-clock_first;
 	clock_msg_last = now;
 	
 	long long time_now_nsec = (time_now.tv_sec * 1000000000) + time_now.tv_nsec;
@@ -1612,7 +1621,7 @@ static void tls_msg_cb_bench(int write_p, int version, int content_type,
 	getrusage(RUSAGE_SELF,&rusage);
 	long long unsigned rutime = (rusage.ru_utime.tv_sec*1000000) + rusage.ru_utime.tv_usec;
 	long long unsigned rstime = (rusage.ru_stime.tv_sec*1000000) + rusage.ru_stime.tv_usec;
-	printf("Bench: type=tls_msg_cb_bench n=%d rnd=%s groups=%s write_p=0x%x ver=0x%x content_type=%d content_type_string='%s' handshake_type_string='%s' len=%lu sum_len=%lu clock=%lu clock_delta=%lu time_delta=%lld time=%lld time_abs=%lld clock_abs=%lu rutime=%llu rstime=%llu\n", n_msg, hex, groups, write_p, version, content_type, openssl_content_type(content_type), openssl_handshake_type(content_type, buf, len), len, sum, now, clock_delta, time_delta, time_now_nsec, time_abs, clock_abs, rutime, rstime);
+	printf("Bench: type=tls_msg_cb_bench n=%d rnd=%s groups=%s write_p=0x%x ver=0x%x content_type=%d content_type_string='%s' handshake_type_string='%s' len=%lu sum_len=%lu clock=%llu clock_delta=%llu time_delta=%lld time=%lld time_abs=%lld clock_abs=%llu rutime=%llu rstime=%llu\n", n_msg, hex, groups, write_p, version, content_type, openssl_content_type(content_type), openssl_handshake_type(content_type, buf, len), len, sum, now, clock_delta, time_delta, time_now_nsec, time_abs, clock_abs, rutime, rstime);
 	//sprintf(benchmark_results[bcount], "Bench: type=tls_msg_cb_bench rnd=%s groups=%s write_p=0x%x ver=0x%x content_type=%d content_type_string='%s' handshake_type_string='%s' len=%lu", hex, groups, write_p, version, content_type, openssl_content_type(content_type), openssl_handshake_type(content_type, buf, len), len);
 	//bcount++;
 	n_msg++;
@@ -4381,7 +4390,7 @@ openssl_handshake(struct tls_connection *conn, const struct wpabuf *in_data)
 	int res;
 	struct wpabuf *out_data;
 	if (clock_first == 0) {
-		clock_first = clock();
+		clock_first = _clock();
         	clock_gettime(CLOCK_MONOTONIC, &time_first);
 	}
 

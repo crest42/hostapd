@@ -35,6 +35,11 @@
 
 const struct wpa_driver_ops *const wpa_drivers[] = { NULL };
 
+static long long unsigned _clock(void) {
+	struct timespec now;
+        clock_gettime(CLOCK_PROCESS_CPUTIME_ID, &now);
+	return  (now.tv_sec * 1000000000) + now.tv_nsec;
+}
 
 struct extra_radius_attr {
 	u8 type;
@@ -1257,7 +1262,7 @@ int main(int argc, char *argv[])
 	const char *ctrl_iface = NULL;
 	struct timeval wct_total_start, wct_total_end;
 	gettimeofday(&wct_total_start, NULL);
-	clock_t total_start = clock();
+	long long unsigned total_start = _clock();
 	
 	if (os_program_init())
 		return -1;
@@ -1477,12 +1482,12 @@ int main(int argc, char *argv[])
 		printf("FAILURE\n");
 	else
 		printf("SUCCESS\n");
-	clock_t total_end = clock();
+	long long unsigned total_end = _clock();
 	gettimeofday(&wct_total_end, NULL);
 	long long wtc_total_start_us = ((long)wct_total_start.tv_sec) * 1000000 + wct_total_start.tv_usec;
 	long long wtc_total_end_us = ((long)wct_total_end.tv_sec) * 1000000 + wct_total_end.tv_usec;
 
-	printf("time_total %lu %f %lld\n", total_end-total_start, ((double)(total_end-total_start))/CLOCKS_PER_SEC, wtc_total_end_us-wtc_total_start_us);
+	printf("time_total %llu %f %lld\n", total_end-total_start, ((double)(total_end-total_start))/CLOCKS_PER_SEC, wtc_total_end_us-wtc_total_start_us);
 	os_program_deinit();
 
 	return ret;
