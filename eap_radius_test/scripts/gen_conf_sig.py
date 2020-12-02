@@ -59,7 +59,7 @@ sigs = []
 PQ_L1_SIG = []
 #PQ_L1_SIG = ['dilithium2','falcon512','picnicl1full','picnic3l1','rainbowIaclassic' ,'sphincsharaka128frobust']
 #PQ_L1_SIG_DISABLED = ['picnicl1fs','picnicl1ur', 'rainbowIacyclic','rainbowIacycliccompressed','sphincsharaka128fsimple','sphincsharaka128srobust','sphincsharaka128ssimple','sphincssha256128frobust','sphincssha256128fsimple','sphincssha256128srobust','sphincssha256128ssimple','sphincsshake256128frobust','sphincsshake256128fsimple','sphincsshake256128srobust', 'sphincsshake256128ssimple']
-PQ_L3_SIG = ['dilithium4','picnic3l3','rainbowIIIcclassic', 'rainbowIIIccyclic', 'rainbowIIIccycliccompressed','sphincsharaka192frobust','sphincsharaka192fsimple','sphincsharaka192srobust','sphincsharaka192ssimple','sphincssha256192frobust','sphincssha256192fsimple','sphincssha256192srobust','sphincssha256192ssimple','sphincsshake256192frobust', 'sphincsshake256192fsimple', 'sphincsshake256192srobust', 'sphincsshake256192ssimple']
+PQ_L3_SIG = ['dilithium4','picnic3l3','rainbowIIIclassic', 'rainbowIIIcircumzenithal', 'rainbowIIIcompressed','sphincsharaka192frobust','sphincsharaka192fsimple','sphincsharaka192srobust','sphincsharaka192ssimple','sphincssha256192frobust','sphincssha256192fsimple','sphincssha256192srobust','sphincssha256192ssimple','sphincsshake256192frobust', 'sphincsshake256192fsimple', 'sphincsshake256192srobust', 'sphincsshake256192ssimple']
 PQ_L3_SIG_DISABLED = ['dilithium3']
 
 

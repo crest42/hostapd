@@ -14,7 +14,7 @@ PQ_L1_CURVES = ["bike1l1cpa", "bike1l1fo",
 
 PQ_L3_CURVES = ["bike1l3cpa", "bike1l3fo",
                "frodo976aes", "frodo976shake",
-               "hqc192_1_cca2", "hqc192_2_cca2",
+               "hqc192",
                "kyber768", "kyber90s768",
                "ntru_hps2048677", "ntru_hrss701",
                "saber",
