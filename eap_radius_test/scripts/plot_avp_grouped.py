@@ -35,7 +35,8 @@ for k in m:
 for k in m_c:
     tmp.loc[tmp['rad_code'] == k, 'rad_code_long'] = m_c[k]
 
-sns.boxplot(data=tmp.groupby(['algo', 'mandatory']).sum().reset_index(), x='mandatory', y='rad_avp_len')
+ax = sns.boxplot(data=tmp.groupby(['algo', 'mandatory']).sum().reset_index(), x='mandatory', y='rad_avp_len')
+ax.set(xlabel='Mandatory', ylabel='Sum AVP Bytes')
 savefig(__file__)
 
 #plt.show()
