@@ -36,8 +36,8 @@
 #define EAP_MAX_AUTH_ROUNDS_SHORT 4000
 #define EAP_CLIENT_TIMEOUT_DEFAULT 60
 
-clock_t eap_start;
-clock_t eap_end;
+long long unsigned eap_start;
+long long unsigned eap_end;
 
 static bool eap_sm_allowMethod(struct eap_sm *sm, int vendor,
 			       enum eap_type method);
@@ -54,6 +54,12 @@ static const char * eap_sm_decision_txt(EapDecision decision);
 static void eap_sm_request(struct eap_sm *sm, enum wpa_ctrl_req_type field,
 			   const char *msg, size_t msglen);
 
+
+static long long unsigned _clock(void) {
+        struct timespec now;
+        clock_gettime(CLOCK_PROCESS_CPUTIME_ID, &now);
+        return  (now.tv_sec * 1000000000) + now.tv_nsec;
+}
 
 
 static bool eapol_get_bool(struct eap_sm *sm, enum eapol_bool_var var)
@@ -217,7 +223,7 @@ static int eap_sm_append_3gpp_realm(struct eap_sm *sm, char *imsi,
  */
 SM_STATE(EAP, INITIALIZE)
 {
-	eap_start = clock();
+	eap_start = _clock();
 	SM_ENTRY(EAP, INITIALIZE);
 	if (sm->fast_reauth && sm->m && sm->m->has_reauth_data &&
 	    sm->m->has_reauth_data(sm, sm->eap_method_priv) &&
@@ -1048,8 +1054,8 @@ SM_STATE(EAP, RETRANSMIT)
 SM_STATE(EAP, SUCCESS)
 {
 	struct eap_peer_config *config = eap_get_config(sm);
-	eap_end = clock();
-	printf("time_eap %lu %f 0\n", eap_end-eap_start, ((double)(eap_end-eap_start))/CLOCKS_PER_SEC);
+	eap_end = _clock();
+	printf("time_eap %llu\n", eap_end-eap_start);
 
 	SM_ENTRY(EAP, SUCCESS);
 	if (sm->eapKeyData != NULL)
