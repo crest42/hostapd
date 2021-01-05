@@ -8,7 +8,7 @@ from os import path, makedirs, getcwd
 i = 0
 KEM_CONF_DIR='../confs/kem/'
 LOG_BASE_DIR='../logs'
-LOG_DIR=f'{LOG_BASE_DIR}/kem_static'
+LOG_DIR=f'{LOG_BASE_DIR}/kem_{sys.argv[1]}'
 
 if not path.exists(LOG_BASE_DIR):
     makedirs(LOG_BASE_DIR)
@@ -61,7 +61,7 @@ for e in range(RUNS):
                 rc = copen.wait()
                 sopen.send_signal(signal.SIGINT)
                 sopen.wait()
-                time.sleep(0.2)
+                time.sleep(0.5)
                 tshark_open.send_signal(signal.SIGINT)
                 tshark_open.wait()
                 logfile.flush()

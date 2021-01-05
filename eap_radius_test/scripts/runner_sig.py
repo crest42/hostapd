@@ -8,7 +8,7 @@ import signal
 LOG_BASE_DIR = '../logs'
 HOSTAPD_CONF_DIR = '../confs/sig/hostapd/'
 RADDB_CONF_DIR = '../confs/sig/raddb/'
-LOG_DIR = f'{LOG_BASE_DIR}/sig_0ms/'
+LOG_DIR = f'{LOG_BASE_DIR}/sig_{sys.argv[1]}/'
 if not os.path.exists(LOG_DIR):
     os.makedirs(LOG_DIR)  
 h_dirlist = os.listdir(HOSTAPD_CONF_DIR)
