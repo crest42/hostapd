@@ -6,9 +6,12 @@ import json
 import pprint
 import numpy as np
 import pandas as pd
-APPEND = '_0ms'
+APPEND = '0ms'
+if len(sys.argv) == 3:
+  APPEND = sys.argv[2]
 LOG_BASE_DIR = '../logs/'
-LOG_DIR = f'{LOG_BASE_DIR}/kem{APPEND}'
+LOG_DIR = f'{LOG_BASE_DIR}/kem_{APPEND}'
+PKL_DIR = './pkl/kem'
 
 def parse_algo(l):
     split = l.split('_')
@@ -27,7 +30,7 @@ def parse_bench(line, algo, ts, run):
 
 def parse_time(line, algo, ts, run):
     s = line.rstrip().split(' ')
-    return {'run': run, 'ts': ts, 'type': s[0], 'algo': algo,  'clock': s[1], 'cpu_time': s[2], 'wct': s[3]}
+    return {'run': run, 'ts': ts, 'type': s[0], 'algo': algo,  'clock': s[1]}
 
 def __get_frame_info(frame, d):
     d['time'] = frame['frame.time']
@@ -178,8 +181,8 @@ def beautify_info(_info_cb):
 
 def beautify_time(_time_df):
     _time_df['clock'] = _time_df['clock'].astype('float')
-    _time_df['cpu_time'] = _time_df['cpu_time'].astype('float')
-    _time_df['wct'] = _time_df['wct'].astype('float')
+    #_time_df['cpu_time'] = _time_df['cpu_time'].astype('float')
+    #_time_df['wct'] = _time_df['wct'].astype('float')
     _df_total = _time_df[_time_df['type'] == 'time_total']
     _df_eap = _time_df[_time_df['type'] == 'time_eap']
     return _df_total, _df_eap
@@ -255,24 +258,24 @@ def _parse(_min=0, _max=None):
 
 def main(load=None, store=None):
     if load is not None:
-        _msg_cb = pd.read_pickle(f"./pkl/msg_cb{APPEND}.pkl")
-        _info_cb = pd.read_pickle(f"./pkl/info_cb{APPEND}.pkl")
-        _df_total = pd.read_pickle(f"./pkl/df_total{APPEND}.pkl")
-        _df_eap = pd.read_pickle(f"./pkl/df_eap{APPEND}.pkl")
-        _cap_df = pd.read_pickle(f"./pkl/cap_df{APPEND}.pkl")
+        _msg_cb = pd.read_pickle(f"{PKL_DIR}/msg_cb_{APPEND}.pkl")
+        _info_cb = pd.read_pickle(f"{PKL_DIR}/info_cb_{APPEND}.pkl")
+        _df_total = pd.read_pickle(f"{PKL_DIR}/df_total_{APPEND}.pkl")
+        _df_eap = pd.read_pickle(f"{PKL_DIR}/df_eap_{APPEND}.pkl")
+        _cap_df = pd.read_pickle(f"{PKL_DIR}/cap_df_{APPEND}.pkl")
         return (_msg_cb, _info_cb, _df_total, _df_eap, _cap_df)
     (_msg_cb, _info_cb, _df_total, _df_eap, _cap_df) = _parse()
     if store is not None:
         if _msg_cb is not None:
-            _msg_cb.to_pickle(f"./pkl/msg_cb{APPEND}.pkl")
+            _msg_cb.to_pickle(f"{PKL_DIR}/msg_cb_{APPEND}.pkl")
         if _info_cb is not None:
-            _info_cb.to_pickle(f"./pkl/info_cb{APPEND}.pkl")
+            _info_cb.to_pickle(f"{PKL_DIR}/info_cb_{APPEND}.pkl")
         if _df_total is not None:
-            _df_total.to_pickle(f"./pkl/df_total{APPEND}.pkl")
+            _df_total.to_pickle(f"{PKL_DIR}/df_total_{APPEND}.pkl")
         if _df_eap is not None:
-            _df_eap.to_pickle(f"./pkl/df_eap{APPEND}.pkl")
+            _df_eap.to_pickle(f"{PKL_DIR}/df_eap_{APPEND}.pkl")
         if _cap_df is not None:
-            _cap_df.to_pickle(f"./pkl/cap_df{APPEND}.pkl")
+            _cap_df.to_pickle(f"{PKL_DIR}/cap_df_{APPEND}.pkl")
 
     return (_msg_cb, _info_cb, _df_total, _df_eap, _cap_df)
 
@@ -301,12 +304,12 @@ PQ_L1_CURVES = ["bike1l1cpa", "bike1l1fo",
 
 PQ_L3_CURVES = ["bike1l3cpa", "bike1l3fo",
                "frodo976aes", "frodo976shake",
-               "hqc192_1_cca2", "hqc192_2_cca2",
+               "hqc192",
                "kyber768", "kyber90s768",
                "ntru_hps2048677", "ntru_hrss701",
                "saber",
-               "sidhp610", "sikep610", 'P-384']
-
+               "sidhp610", "sikep610", 'P-384', 
+               "ntrulpr761", "sntrup761"]
 
 PQ_L5_CURVES = ["frodo1344aes", "frodo1344shake",
                 "hqc256_1_cca2", "hqc256_2_cca2", "hqc256_3_cca2",
