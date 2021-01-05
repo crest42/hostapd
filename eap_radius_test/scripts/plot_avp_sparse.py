@@ -22,8 +22,9 @@ sparse['type'] = 'Sparse'
 
 final = pd.concat([full[['algo','run','rad_avp_t','rad_avp_len','type']], sparse[['algo','run','rad_avp_t','rad_avp_len','type']]])
 
-sns.boxplot(data=final.groupby(['algo','run','type']).sum().reset_index(), x='type', y='rad_avp_len')
+ax = sns.boxplot(data=final.groupby(['algo','run','type']).sum().reset_index(), x='type', y='rad_avp_len')
 
+ax.set(xlabel='Setting', ylabel='Sum AVP Bytes')
 savefig(__file__)
 
 #plt.show()
