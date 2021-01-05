@@ -9,9 +9,11 @@ import psutil
 import numpy as np
 import ray
 import pandas as pd
-APPEND = '_fragment_size'
+APPEND = '0ms'
+if len(sys.argv) == 3:
+  APPEND = sys.argv[2]
 LOG_BASE_DIR = '../logs/'
-LOG_DIR = f'{LOG_BASE_DIR}/sig{APPEND}'
+LOG_DIR = f'{LOG_BASE_DIR}/sig_{APPEND}'
 
 def usage():
      process = psutil.Process(os.getpid())
@@ -34,7 +36,7 @@ def parse_bench(line, algo, ts, run):
 
 def parse_time(line, algo, ts, run):
     s = line.rstrip().split(' ')
-    return {'run': run, 'ts': ts, 'type': s[0], 'algo': algo,  'clock': s[1], 'cpu_time': s[2], 'wct': s[3]}
+    return {'run': run, 'ts': ts, 'type': s[0], 'algo': algo,  'clock': s[1]}
 
 def __get_frame_info(frame, d):
     d['time'] = frame['frame.time']
@@ -235,8 +237,6 @@ def beautify_info(_info_cb):
 
 def beautify_time(_time_df):
     _time_df['clock'] = _time_df['clock'].astype('float')
-    _time_df['cpu_time'] = _time_df['cpu_time'].astype('float')
-    _time_df['wct'] = _time_df['wct'].astype('float')
     _df_total = _time_df[_time_df['type'] == 'time_total']
     _df_eap = _time_df[_time_df['type'] == 'time_eap']
     return _df_total, _df_eap
@@ -328,34 +328,34 @@ def main(cap_df, load=None, store=None, cap=False):
         _df_total = None
         _df_eap = None
         if not cap:
-            _msg_cb = pd.read_pickle(f"./pkl/sig/msg_cb{APPEND}.pkl")
+            _msg_cb = pd.read_pickle(f"./pkl/sig/msg_cb_{APPEND}.pkl")
         if not cap:
-            _info_cb = pd.read_pickle(f"./pkl/sig/info_cb{APPEND}.pkl")
+            _info_cb = pd.read_pickle(f"./pkl/sig/info_cb_{APPEND}.pkl")
         if not cap:
-            _df_total = pd.read_pickle(f"./pkl/sig/df_total{APPEND}.pkl")
+            _df_total = pd.read_pickle(f"./pkl/sig/df_total_{APPEND}.pkl")
         if not cap:
-            _df_eap = pd.read_pickle(f"./pkl/sig/df_eap{APPEND}.pkl")
+            _df_eap = pd.read_pickle(f"./pkl/sig/df_eap_{APPEND}.pkl")
         if cap:
-            cap_df = pd.read_pickle(f"./pkl/sig/cap_df{APPEND}.pkl")
+            cap_df = pd.read_pickle(f"./pkl/sig/cap_df_{APPEND}.pkl")
         return (_msg_cb, _info_cb, _df_total, _df_eap, cap_df)
     (_msg_cb, _info_cb, _df_total, _df_eap, cap_df) = _parse(cap_df, cap)
     print("Parsing Done store Data")
     if store is not None:
         if _msg_cb is not None:
-            print(f"./pkl/sig/msg_cb{APPEND}.pkl")
-            _msg_cb.to_pickle(f"./pkl/sig/msg_cb{APPEND}.pkl")
+            print(f"./pkl/sig/msg_cb_{APPEND}.pkl")
+            _msg_cb.to_pickle(f"./pkl/sig/msg_cb_{APPEND}.pkl")
         if _info_cb is not None:
-            print(f"./pkl/sig/info_cb{APPEND}.pkl")
-            _info_cb.to_pickle(f"./pkl/sig/info_cb{APPEND}.pkl")
+            print(f"./pkl/sig/info_cb_{APPEND}.pkl")
+            _info_cb.to_pickle(f"./pkl/sig/info_cb_{APPEND}.pkl")
         if _df_total is not None:
-            print(f"./pkl/sig/df_total{APPEND}.pkl")
-            _df_total.to_pickle(f"./pkl/sig/df_total{APPEND}.pkl")
+            print(f"./pkl/sig/df_total_{APPEND}.pkl")
+            _df_total.to_pickle(f"./pkl/sig/df_total_{APPEND}.pkl")
         if _df_eap is not None:
-            print(f"./pkl/sig/df_eap{APPEND}.pkl")
-            _df_eap.to_pickle(f"./pkl/sig/df_eap{APPEND}.pkl")
+            print(f"./pkl/sig/df_eap_{APPEND}.pkl")
+            _df_eap.to_pickle(f"./pkl/sig/df_eap_{APPEND}.pkl")
         if len(cap_df) > 0:
-            print(f"./pkl/sig/cap_df{APPEND}.pkl")
-            cap_df.to_pickle(f"./pkl/sig/cap_df{APPEND}.pkl")
+            print(f"./pkl/sig/cap_df_{APPEND}.pkl")
+            cap_df.to_pickle(f"./pkl/sig/cap_df_{APPEND}.pkl")
 
     return (_msg_cb, _info_cb, _df_total, _df_eap, cap_df)
 
