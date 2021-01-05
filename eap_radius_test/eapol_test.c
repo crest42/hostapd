@@ -1260,8 +1260,6 @@ int main(int argc, char *argv[])
 	struct extra_radius_attr *p = NULL, *p1;
 	const char *ifname = "test";
 	const char *ctrl_iface = NULL;
-	struct timeval wct_total_start, wct_total_end;
-	gettimeofday(&wct_total_start, NULL);
 	long long unsigned total_start = _clock();
 	
 	if (os_program_init())
@@ -1483,11 +1481,7 @@ int main(int argc, char *argv[])
 	else
 		printf("SUCCESS\n");
 	long long unsigned total_end = _clock();
-	gettimeofday(&wct_total_end, NULL);
-	long long wtc_total_start_us = ((long)wct_total_start.tv_sec) * 1000000 + wct_total_start.tv_usec;
-	long long wtc_total_end_us = ((long)wct_total_end.tv_sec) * 1000000 + wct_total_end.tv_usec;
-
-	printf("time_total %llu %f %lld\n", total_end-total_start, ((double)(total_end-total_start))/CLOCKS_PER_SEC, wtc_total_end_us-wtc_total_start_us);
+	printf("time_total %llu\n", total_end-total_start);
 	os_program_deinit();
 
 	return ret;
