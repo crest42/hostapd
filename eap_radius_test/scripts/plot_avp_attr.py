@@ -29,8 +29,9 @@ for k in m_c:
     tmp.loc[tmp['rad_code'] == k, 'rad_code_long'] = m_c[k]
 
 tmp = tmp[tmp['rad_code_long'] != 'Access-Accept']
+tmp = tmp.rename({'rad_code': 'Radius Type', 'rad_avp_len': 'Bytes', 'rad_avp_t_long': 'AVP Type'}, axis=1)
 
-sns.boxplot(data=tmp.sort_values(['rad_code','rad_avp_len']), x='rad_code_long', y='rad_avp_len', hue='rad_avp_t_long')
+sns.boxplot(data=tmp.sort_values(['Radius Type','Bytes']), x='Radius Type', y='Bytes', hue='AVP Type')
 savefig(__file__)
 
 #plt.show()

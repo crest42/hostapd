@@ -13,6 +13,7 @@ tmp['AVP/Radius'] = tmp['rad_avp_len'] / tmp['rad_len']
 tmp['TLS/EAP'] = tmp['tls.record.length'] / tmp['eap.len']
 
 test = tmp[['algo','TLS/Total', 'TLS/EAP', 'EAP/AVP', 'AVP/Radius']].melt(id_vars=['algo'])
-sns.boxplot(data=test, y='value', x='variable', order = ['TLS/Total','EAP/AVP', 'AVP/Radius', 'TLS/EAP'])
+ax = sns.boxplot(data=test, y='value', x='variable', order = ['TLS/Total','EAP/AVP', 'AVP/Radius', 'TLS/EAP'])
+ax.set(xlabel='Protocol Type', ylabel='Ratio')
 #plt.show()
 savefig(__file__)

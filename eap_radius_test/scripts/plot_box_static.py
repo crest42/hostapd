@@ -1,6 +1,6 @@
 from plot import *
 
-msg_cb = add_sec_level(msg_cb,'algo')
+msg_cb = add_sec_level(pd.read_pickle('./pkl/msg_cb.pkl').rename({'groups': 'algo'}, axis=1),'algo')
 msg_cb_static = add_sec_level(pd.read_pickle('./pkl/msg_cb_static_zero_overhead.pkl'),'algo')
 
 msg_cb_static = msg_cb_static[msg_cb_static['sec_level'] == 3]
@@ -19,7 +19,8 @@ plot_df = pd.concat([msg_cb_static_last, msg_cb_last])
 
 order = plot_df.groupby(['algo']).mean().reset_index().sort_values('clock_abs')['algo']
 
-sns.boxplot(data=plot_df, y='algo', x='clock_abs', hue='static' , order = order)
+ax = sns.boxplot(data=plot_df.rename({'static': 'Static'}, axis=1), y='algo', x='clock_abs', hue='Static' , order = order)
+ax.set(xlabel='CPU Cycles', ylabel='Algorithm')
 #plt.show()
 plt.tight_layout()
 savefig(__file__)

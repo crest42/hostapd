@@ -47,17 +47,17 @@ robo_df['total'] = scaler.fit_transform(np.array(robo_df['total']).reshape(-1,1)
 #plot_df = plot_df.sort_values('clock')
 plot_df = new_df.sort_values('algo')
 plot_df['total'] = robo_df.sort_values('name')['total']
-
-ax =sns.scatterplot(data=plot_df, y='clock', x='total', hue='algo', style='algo')
+plot_df = plot_df.rename({'algo': 'Algorithm'}, axis=1)
+ax1 =sns.scatterplot(data=plot_df, y='clock', x='total', hue='Algorithm', style='Algorithm')
 regr = linear_model.LinearRegression()
 regr.fit(np.array(plot_df['clock']).reshape(-1,1), np.array(plot_df['total']).reshape(-1,1))
 uni = np.linspace(0,1,100)
 reg_line = pd.DataFrame([[uni[i], regr.coef_[0][0]*uni[i]] for i,x in enumerate(uni)], columns=['x','y'])
 
 
-ax =sns.lineplot(data=reg_line, y='y', x='x')
-ax.set(xlabel='Cycles hostpad', ylabel='Cycles Robocop')
-ax.legend(loc='best')
+ax =sns.lineplot(data=reg_line, y='y', x='x', legend=False)
+ax.set(xlabel='CPU Cycles hostpad', ylabel='CPU Cycles Robocop')
+#ax1.legend(loc='best')
 
 
 savefig(__file__)
